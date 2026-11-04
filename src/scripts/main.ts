@@ -149,6 +149,23 @@ interface FotoVisor { id: string; titulo: string; categoria: string; alt: string
 const mosaico = $('[data-mosaico]');
 const obras = mosaico ? $$<HTMLLIElement>('.obra', mosaico) : [];
 const filtros = $('[data-filtros]');
+const botonMas = $<HTMLButtonElement>('[data-mosaico-mas]');
+const textoMas = $('[data-mosaico-mas-texto]');
+const textoMasInicial = textoMas?.textContent ?? '';
+botonMas?.addEventListener('click', () => {
+  if (!mosaico) return;
+  const abrir = !mosaico.classList.contains('completo');
+  mosaico.classList.toggle('completo', abrir);
+  botonMas.setAttribute('aria-expanded', String(abrir));
+  if (textoMas) textoMas.textContent = abrir ? 'Ver menos' : textoMasInicial;
+  if (abrir) {
+    // Las que aparecen entran ya visibles (sin esperar al scroll).
+    obras.forEach((o) => $('.revelar-foto', o)?.classList.add('visible'));
+  } else {
+    const seccion = $('#proyectos');
+    if (seccion && seccion.getBoundingClientRect().top < 0) seccion.scrollIntoView({ behavior: reducido.matches ? 'auto' : 'smooth' });
+  }
+});
 if (filtros && mosaico) {
   const estado = $('[data-filtros-estado]');
   filtros.addEventListener('click', (e) => {
@@ -162,6 +179,9 @@ if (filtros && mosaico) {
       o.hidden = !ok;
       if (ok) { visibles++; $('.revelar-foto', o)?.classList.add('visible'); }
     });
+    // Con un tipo elegido se ven todas las de ese tipo; el «Ver más» solo aplica a «Todos».
+    mosaico.classList.toggle('filtrado', f !== 'todos');
+    if (botonMas) botonMas.parentElement!.hidden = f !== 'todos';
     if (estado) estado.textContent = `${visibles} ${visibles === 1 ? 'foto' : 'fotos'}`;
   });
 }
@@ -181,8 +201,8 @@ if (visor && datosVisor && mosaico) {
   let actual = 0;
   let enHistorial = false;
 
-  // Solo se recorre lo que el filtro deja a la vista.
-  const visibles = () => obras.map((o, i) => (o.hidden ? -1 : i)).filter((i) => i >= 0);
+  // Solo se recorre lo que está a la vista (filtro y «Ver más»).
+  const visibles = () => obras.map((o, i) => (o.getClientRects().length ? i : -1)).filter((i) => i >= 0);
   const juego = (f: FotoVisor, formato: string) => f.anchos.map((w) => `/img/${f.id}-${w}.${formato} ${w}w`).join(', ');
 
   function mostrar(i: number) {
