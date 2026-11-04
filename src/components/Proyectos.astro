@@ -1,0 +1,192 @@
+---
+// Galería de tableros reales. Mosaico con filtros por tipo y un visor a pantalla completa con
+// «Cotizar uno similar» (WhatsApp con el nombre del tablero ya escrito).
+import Foto from './Foto.astro';
+import Icono from './Icono.astro';
+import { FOTOS } from '../lib/fotos';
+import { CATEGORIAS } from '../../scripts/imagenes.config.mjs';
+import { EMPRESA, MENSAJES } from '../lib/empresa';
+
+const nombreCategoria = Object.fromEntries(CATEGORIAS.map((c) => [c.id, c.nombre]));
+const forma = (f: (typeof FOTOS)[number]) => (f.ancho / f.alto > 1.02 ? 'ancho' : 'alto');
+const datosVisor = FOTOS.map((f) => ({
+  id: f.id,
+  titulo: f.titulo,
+  categoria: nombreCategoria[f.categoria],
+  alt: f.alt,
+  anchos: f.anchos,
+  ancho: f.ancho,
+  alto: f.alto,
+  color: f.color,
+}));
+const visorJson = JSON.stringify({ fotos: datosVisor, whatsapp: EMPRESA.whatsapp, plantilla: MENSAJES.similar('{t}') }).replace(/</g, '\\u003c');
+---
+<section id="proyectos" class="seccion proyectos" aria-labelledby="proyectos-titulo">
+  <div class="contenedor">
+    <header class="proyectos__cabeza">
+      <p class="rotulo revelar"><b>03</b> Proyectos y productos</p>
+      <h2 id="proyectos-titulo" class="titular titular--2xl revelar" style="--retardo:0.05s">Tableros que salen de nuestro taller<span class="punto">.</span></h2>
+    </header>
+
+    <div class="filtros revelar" role="toolbar" aria-label="Filtrar por tipo de tablero" data-filtros>
+      <button type="button" aria-pressed="true" data-filtro="todos">Todos <span class="mono">{FOTOS.length}</span></button>
+      {CATEGORIAS.map((c) => (
+        <button type="button" aria-pressed="false" data-filtro={c.id}>
+          {c.nombre} <span class="mono">{FOTOS.filter((f) => f.categoria === c.id).length}</span>
+        </button>
+      ))}
+    </div>
+    <p class="sr" aria-live="polite" data-filtros-estado></p>
+
+    <ul class="mosaico" data-mosaico>
+      {FOTOS.map((f, i) => (
+        <li class:list={['obra', `obra--${forma(f)}`]} data-categoria={f.categoria}>
+          <button type="button" class="obra__boton revelar-foto" style={`--retardo:${(i % 4) * 0.06}s`} data-abrir={i} aria-haspopup="dialog">
+            <Foto id={f.id} sizes={forma(f) === 'ancho' ? '(min-width: 1024px) 48vw, 100vw' : '(min-width: 1024px) 24vw, 50vw'} />
+            <span class="obra__info">
+              <span class="mono">{nombreCategoria[f.categoria]}</span>
+              <span class="obra__titulo">{f.titulo}</span>
+            </span>
+            <span class="obra__mas" aria-hidden="true"><Icono nombre="mas" /></span>
+            <span class="sr">Ampliar foto</span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <dialog class="visor" data-visor aria-labelledby="visor-titulo">
+    <div class="visor__barra">
+      <span class="mono" data-visor-contador></span>
+      <button type="button" class="visor__control" data-visor-cerrar>
+        <Icono nombre="cerrar" /><span class="sr">Cerrar</span>
+      </button>
+    </div>
+    <figure class="visor__figura">
+      <div class="visor__lienzo" data-visor-lienzo>
+        <picture>
+          <source type="image/avif" data-visor-avif />
+          <img data-visor-img alt="" sizes="100vw" />
+        </picture>
+      </div>
+      <figcaption class="visor__pie">
+        <div>
+          <span class="mono" data-visor-categoria></span>
+          <span id="visor-titulo" class="visor__titulo" data-visor-titulo></span>
+        </div>
+        <a class="boton" href="#" target="_blank" rel="noopener" data-visor-cotizar data-evento="whatsapp" data-origen="galeria">
+          <Icono nombre="whatsapp" /><span>Cotizar uno similar</span>
+        </a>
+      </figcaption>
+    </figure>
+    <button type="button" class="visor__control visor__nav visor__nav--anterior" data-visor-anterior>
+      <Icono nombre="anterior" /><span class="sr">Foto anterior</span>
+    </button>
+    <button type="button" class="visor__control visor__nav visor__nav--siguiente" data-visor-siguiente>
+      <Icono nombre="siguiente" /><span class="sr">Foto siguiente</span>
+    </button>
+  </dialog>
+  <script type="application/json" id="datos-visor" set:html={visorJson} />
+</section>
+
+<style>
+  .proyectos { background: var(--negro-2); border-top: 1px solid var(--linea); }
+  .proyectos__cabeza { margin-bottom: clamp(2rem, 4vw, 3rem); }
+  .proyectos__cabeza .rotulo { margin-bottom: 1.25rem; }
+  .proyectos__cabeza h2 { max-width: 18ch; }
+
+  .filtros {
+    display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none;
+    margin-bottom: clamp(1.5rem, 3vw, 2.25rem); padding-bottom: 2px;
+    margin-inline: calc(-1 * var(--margen)); padding-inline: var(--margen);
+    scroll-padding-inline: var(--margen);
+  }
+  .filtros::-webkit-scrollbar { display: none; }
+  .filtros button {
+    flex: none; display: inline-flex; align-items: center; gap: 0.6rem;
+    min-height: 2.75rem; padding: 0.55rem 1rem;
+    border: 1px solid var(--linea-2); color: var(--gris);
+    font-size: var(--t-sm); font-weight: 500;
+    transition: color 0.3s, border-color 0.3s, background-color 0.3s;
+  }
+  .filtros button .mono { color: var(--gris-2); transition: color 0.3s; }
+  .filtros button:hover { color: var(--blanco); border-color: var(--gris-2); }
+  .filtros button[aria-pressed='true'] { background: var(--amarillo); border-color: var(--amarillo); color: var(--negro); }
+  .filtros button[aria-pressed='true'] .mono { color: var(--negro); }
+
+  .mosaico {
+    --columnas: 2;
+    --hueco: 0.5rem;
+    --col: calc((min(100vw - 2 * var(--margen), var(--ancho)) - (var(--columnas) - 1) * var(--hueco)) / var(--columnas));
+    display: grid; grid-template-columns: repeat(var(--columnas), minmax(0, 1fr));
+    grid-auto-rows: calc(var(--col) * 0.75);
+    grid-auto-flow: dense; gap: var(--hueco);
+  }
+  @media (min-width: 1024px) { .mosaico { --columnas: 4; --hueco: 0.75rem; } }
+  .obra { position: relative; grid-row: span 2; }
+  .obra--ancho { grid-column: span 2; }
+  .obra[hidden] { display: none; }
+
+  .obra__boton { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; text-align: left; cursor: zoom-in; }
+  .obra__boton :global(.foto) { position: absolute; inset: 0; }
+  .obra__boton :global(img) { transition: transform 1.1s var(--curva); }
+  .obra__info {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
+    display: grid; gap: 0.15rem;
+    padding: 2.5rem clamp(0.75rem, 1.5vw, 1.1rem) clamp(0.75rem, 1.5vw, 1rem);
+    background: linear-gradient(to top, rgb(8 8 8 / 0.88), rgb(8 8 8 / 0));
+  }
+  .obra__info .mono { color: var(--amarillo); font-size: 0.625rem; }
+  .obra__titulo { font-size: var(--t-sm); font-weight: 500; line-height: 1.35; }
+  @media (max-width: 559px) {
+    .obra--alto .obra__info .mono { display: none; }
+    .obra__titulo { font-size: 0.8125rem; }
+  }
+  .obra__mas {
+    position: absolute; top: 0; right: 0; z-index: 1;
+    display: grid; place-items: center; width: 2.5rem; height: 2.5rem;
+    background: var(--amarillo); color: var(--negro);
+    transform: translate(100%, -100%); transition: transform 0.45s var(--curva);
+  }
+  .obra__mas :global(.icono) { width: 1.1rem; height: 1.1rem; }
+  @media (hover: hover) {
+    .obra__boton:hover :global(img) { transform: scale(1.045); }
+    .obra__boton:hover .obra__mas, .obra__boton:focus-visible .obra__mas { transform: none; }
+  }
+  .obra__boton:focus-visible { outline-offset: -3px; }
+
+  /* ---------------------------------------------------------------- visor */
+  .visor {
+    position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
+    margin: 0; padding: 0; border: 0; background: rgb(8 8 8 / 0.97); color: var(--blanco);
+    overscroll-behavior: contain;
+  }
+  .visor[open] { display: grid; grid-template-rows: auto 1fr; }
+  .visor::backdrop { background: rgb(0 0 0 / 0.6); }
+  .visor__barra { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem var(--margen); }
+  .visor__barra .mono { color: var(--gris); }
+  .visor__control {
+    display: grid; place-items: center; width: 3rem; height: 3rem;
+    border: 1px solid var(--linea-2); background: rgb(8 8 8 / 0.6); color: var(--blanco);
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .visor__control:hover { border-color: var(--amarillo); color: var(--amarillo); }
+  .visor__control :global(.icono) { width: 1.35rem; height: 1.35rem; }
+  .visor__figura { display: grid; grid-template-rows: 1fr auto; min-height: 0; padding: 0 var(--margen) calc(1rem + env(safe-area-inset-bottom)); gap: 1rem; }
+  .visor__lienzo { position: relative; min-height: 0; display: grid; place-items: center; touch-action: pan-y; }
+  .visor__lienzo picture, .visor__lienzo img { max-width: 100%; max-height: 100%; }
+  .visor__lienzo img { width: auto; height: auto; max-height: calc(100svh - 12rem); object-fit: contain; background: var(--grafito); transition: opacity 0.25s; }
+  .visor__lienzo.cargando img { opacity: 0.35; }
+  .visor__pie { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; max-width: var(--ancho); width: 100%; margin-inline: auto; }
+  .visor__pie > div { display: grid; gap: 0.2rem; }
+  .visor__pie .mono { color: var(--amarillo); }
+  .visor__titulo { font-family: var(--f-titular); text-transform: uppercase; font-size: var(--t-lg); line-height: 1.15; }
+  .visor__nav { position: absolute; top: 50%; transform: translateY(-50%); }
+  .visor__nav--anterior { left: var(--margen); }
+  .visor__nav--siguiente { right: var(--margen); }
+  @media (max-width: 767px) {
+    .visor__nav { top: auto; bottom: calc(5.5rem + env(safe-area-inset-bottom)); transform: none; }
+    .visor__pie .boton { width: 100%; }
+    .visor__lienzo img { max-height: calc(100svh - 16rem); }
+  }
+</style>

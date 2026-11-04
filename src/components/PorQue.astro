@@ -1,0 +1,67 @@
+---
+import Logo from './Logo.astro';
+// Sección amarilla, la única: un barraje negro que alimenta cuatro circuitos, uno por razón.
+// Sin cifras, años, certificaciones ni garantías: no se suministraron.
+const RAZONES = [
+  { titulo: 'Soluciones para el sector industrial', texto: 'Distribución y control eléctrico pensados para la operación de la industria.' },
+  { titulo: 'Comercialización de material eléctrico', texto: 'Componentes y materiales eléctricos para aplicaciones industriales.' },
+  { titulo: 'Ensamble de tableros eléctricos', texto: 'Tableros armados e integrados según los requerimientos de cada proyecto.' },
+  { titulo: 'Atención y asesoría comercial', texto: 'Te orientamos para elegir el material y el tablero que tu proyecto necesita.' },
+];
+---
+<section id="por-que" class="seccion porque" aria-labelledby="porque-titulo">
+  <div class="contenedor">
+    <header class="porque__cabeza">
+      <Logo ancho={260} sizes="(min-width: 1024px) 260px, 200px" class="porque__logo revelar" />
+      <h2 id="porque-titulo" class="titular titular--2xl revelar" style="--retardo:0.05s">¿Por qué AUTIND?</h2>
+    </header>
+
+    <ol class="porque__lista">
+      {RAZONES.map((r, i) => (
+        <li class="razon revelar" style={`--retardo:${0.08 * i}s`}>
+          <svg class="razon__derivacion" viewBox="0 0 28 72" aria-hidden="true" focusable="false">
+            <path d="M14 0 V20 M9 15 L19 25 M9 25 L19 15 M14 50 L3 28 M14 50 V72" />
+          </svg>
+          <span class="razon__num mono">0{i + 1}</span>
+          <h3 class="razon__titulo">{r.titulo}</h3>
+          <p class="razon__texto">{r.texto}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .porque { background: var(--amarillo); color: var(--negro); }
+  .porque ::selection { background: var(--negro); color: var(--amarillo); }
+  .porque__cabeza { display: grid; gap: 1rem; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+  @media (min-width: 1024px) { .porque__cabeza { grid-template-columns: 1fr 2fr; align-items: end; } }
+  .porque__logo :global(img) { width: clamp(180px, 20vw, 260px); height: auto; }
+  .porque__cabeza h2 { font-size: clamp(2.4rem, 1rem + 5vw, 5.4rem); }
+  @media (min-width: 1024px) { .porque__cabeza h2 { text-align: right; } }
+
+  /* El barraje: una línea negra gruesa de la que cuelga cada razón (vertical en celular). */
+  .porque__lista { position: relative; display: grid; border-left: 4px solid var(--negro); }
+  @media (min-width: 900px) {
+    .porque__lista { grid-template-columns: repeat(4, 1fr); border-left: 0; border-top: 4px solid var(--negro); }
+  }
+
+  .razon { position: relative; display: grid; gap: 0.75rem; align-content: start; padding: 1.5rem 0 1.75rem 5rem; }
+  .razon + .razon { border-top: 1px solid rgb(8 8 8 / 0.2); }
+  @media (min-width: 900px) {
+    .razon { padding: 5.25rem clamp(1rem, 2vw, 2rem) 0 0; }
+    .razon + .razon { border-top: 0; border-left: 1px solid rgb(8 8 8 / 0.2); padding-left: clamp(1rem, 2vw, 2rem); }
+  }
+
+  .razon__derivacion { position: absolute; width: 28px; height: 72px; fill: none; stroke: var(--negro); stroke-width: 2; stroke-linecap: square; }
+  /* Celular: la derivación sale hacia la derecha del barraje vertical (girada 90°). */
+  .razon__derivacion { left: -4px; top: 1.55rem; transform: rotate(-90deg); transform-origin: 14px 14px; }
+  @media (min-width: 900px) {
+    .razon__derivacion { left: -14px; top: 0; transform: none; }
+    .razon + .razon .razon__derivacion { left: calc(clamp(1rem, 2vw, 2rem) - 14px); }
+  }
+
+  .razon__num { font-size: var(--t-sm); }
+  .razon__titulo { font-family: var(--f-titular); text-transform: uppercase; font-size: var(--t-lg); line-height: 1.15; max-width: 16ch; }
+  .razon__texto { color: rgb(8 8 8 / 0.78); line-height: 1.6; max-width: 30ch; }
+</style>

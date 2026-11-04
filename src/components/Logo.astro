@@ -1,0 +1,28 @@
+---
+// Logo oficial de AUTIND (archivo del cliente, sin redibujar). Solo se le quitó el lienzo blanco
+// que rodeaba el óvalo (scripts/marca.mjs). Proporción fija 1528 × 1029.
+import marca from '../data/marca.json';
+
+interface Props {
+  ancho: number;
+  sizes: string;
+  prioridad?: boolean;
+  class?: string;
+}
+const { ancho, sizes, prioridad = false, class: clase } = Astro.props;
+const alto = Math.round((ancho * marca.alto) / marca.ancho);
+const set = (f: string) => marca.anchos.map((w) => `/marca/autind-logo-${w}.${f} ${w}w`).join(', ');
+---
+<picture class:list={['logo', clase]}>
+  <source type="image/avif" srcset={set('avif')} sizes={sizes} />
+  <img
+    src="/marca/autind-logo-200.webp"
+    srcset={set('webp')}
+    sizes={sizes}
+    width={ancho}
+    height={alto}
+    alt="AUTIND NC S.A.S."
+    loading={prioridad ? 'eager' : 'lazy'}
+    decoding="async"
+  />
+</picture>

@@ -1,0 +1,86 @@
+---
+// Pantalla de carga: el logo oficial sobre negro y pistas de circuito amarillas que llegan a él.
+// Sin esperas artificiales:
+//   · no hay tiempo mínimo: sale en cuanto el logo está pintado y el HTML está leído;
+//   · la barra avanza con hitos reales (HTML recibido → logo cargado → documento listo);
+//   · no espera fotos, fuentes ni el JS principal; tope duro de 2,5 s pase lo que pase.
+// La maneja su propio script en línea (no main.ts). Solo en la portada, en la primera visita de
+// la sesión y sin modo de ahorro de datos (lo decide el script del <head>).
+const TOPE_MS = 2500;
+const script = `(function(){var h=document.documentElement,c=document.getElementById('cargador');if(!c)return;if(!h.classList.contains('con-cargador')){c.remove();return}var b=c.querySelector('.cargador__barra span'),img=c.querySelector('img'),logo=false,dom=false,fin=false;function avance(p){b.style.transform='scaleX('+p+')'}function r2(f){requestAnimationFrame(function(){requestAnimationFrame(f)})}function cerrar(){if(fin)return;fin=true;avance(1);try{sessionStorage.setItem('autind-intro','1')}catch(e){}setTimeout(function(){h.classList.add('cargador-sale');r2(function(){h.classList.add('intro-lista')});setTimeout(function(){h.classList.remove('con-cargador','cargador-sale');c.remove()},620)},160)}function revisar(){avance(0.2+(logo?0.4:0)+(dom?0.3:0));if(logo&&dom)cerrar()}function alLogo(){c.classList.add('logo-listo');r2(function(){logo=true;revisar()})}if(img.complete&&img.naturalWidth){alLogo()}else{img.addEventListener('load',alLogo);img.addEventListener('error',cerrar)}function alDom(){dom=true;revisar()}if(document.readyState!=='loading'){alDom()}else{document.addEventListener('DOMContentLoaded',alDom)}revisar();setTimeout(cerrar,${TOPE_MS})})();`;
+
+// Pistas de circuito (coordenadas en un lienzo de 1200 × 800; el logo ocupa el centro).
+const pistas = [
+  'M0 180 H260 L330 250 H430',
+  'M0 420 H300 L340 380 H420',
+  'M0 640 H220 L300 560 H440',
+  'M1200 160 H930 L860 230 H770',
+  'M1200 410 H900 L860 370 H780',
+  'M1200 620 H980 L900 540 H760',
+  'M520 0 V120 L560 160 V220',
+  'M690 0 V90 L640 140 V220',
+  'M480 800 V660 L540 600 V580',
+  'M730 800 V690 L660 620 V580',
+];
+const nodos = [[430, 250], [420, 380], [440, 560], [770, 230], [780, 370], [760, 540], [560, 220], [640, 220], [540, 580], [660, 580]];
+---
+<div id="cargador" class="cargador" aria-hidden="true">
+  <svg class="cargador__circuito" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" focusable="false">
+    {pistas.map((d, i) => <path d={d} pathLength="1" style={`--i:${i}`} />)}
+    {nodos.map(([x, y], i) => <rect x={x - 4} y={y - 4} width="8" height="8" style={`--i:${i}`} />)}
+  </svg>
+  <div class="cargador__centro">
+    <picture>
+      <source type="image/avif" srcset="/marca/autind-logo-320.avif 320w, /marca/autind-logo-640.avif 640w" sizes="(min-width: 768px) 300px, 220px" />
+      <img src="/marca/autind-logo-320.webp" srcset="/marca/autind-logo-320.webp 320w, /marca/autind-logo-640.webp 640w" sizes="(min-width: 768px) 300px, 220px" width="320" height="215" alt="" fetchpriority="high" decoding="sync" />
+    </picture>
+    <div class="cargador__barra"><span></span></div>
+    <p class="cargador__texto">Engineering industrial solutions</p>
+  </div>
+</div>
+<script is:inline set:html={script} />
+
+<style>
+  .cargador {
+    display: none;
+    position: fixed; inset: 0; z-index: 400;
+    align-items: center; justify-content: center;
+    background: var(--negro);
+  }
+  :global(html.con-cargador) .cargador { display: flex; }
+  :global(html.cargador-sale) .cargador {
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.6s var(--curva);
+  }
+
+  /* Lienzo 3:2 centrado y nunca más angosto que 900 px: en un celular vertical las pistas que
+     llegan al logo siguen a la vista en vez de quedar fuera de la pantalla. */
+  .cargador__circuito { position: absolute; left: 50%; top: 50%; width: max(100%, 900px, 150vh); height: auto; aspect-ratio: 3 / 2; translate: -50% -50%; }
+  .cargador__circuito path { fill: none; stroke: var(--amarillo); stroke-width: 1.5; opacity: 0.55; stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .cargador__circuito rect { fill: var(--amarillo); opacity: 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .cargador__circuito path { animation: pista 0.9s var(--curva-entra) forwards; animation-delay: calc(var(--i) * 45ms); }
+    .cargador__circuito rect { animation: nodo 0.3s ease-out forwards; animation-delay: calc(0.55s + var(--i) * 45ms); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cargador__circuito path { stroke-dashoffset: 0; }
+    .cargador__circuito rect { opacity: 0.8; }
+  }
+  @keyframes pista { to { stroke-dashoffset: 0; } }
+  @keyframes nodo { to { opacity: 0.9; } }
+  :global(html.cargador-sale) .cargador__circuito { scale: 1.04; transition: scale 0.7s var(--curva); }
+
+  .cargador__centro { position: relative; display: grid; justify-items: center; gap: 1.4rem; }
+  .cargador__centro img { width: clamp(200px, 28vw, 300px); height: auto; opacity: 0; transform: scale(0.97); transition: opacity 0.35s ease-out, transform 0.5s var(--curva); }
+  .cargador.logo-listo img { opacity: 1; transform: none; }
+  :global(html.cargador-sale) .cargador__centro { transform: translateY(-10px); transition: transform 0.6s var(--curva); }
+
+  .cargador__barra { width: 160px; height: 2px; background: var(--linea); overflow: hidden; }
+  .cargador__barra span { display: block; height: 100%; background: var(--amarillo); transform: scaleX(0); transform-origin: 0 50%; transition: transform 0.25s ease-out; }
+
+  .cargador__texto {
+    font-family: var(--f-mono); font-size: 0.6875rem; font-weight: 500;
+    letter-spacing: 0.32em; text-transform: uppercase; color: var(--gris);
+    padding-left: 0.32em;
+  }
+</style>

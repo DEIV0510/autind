@@ -1,0 +1,29 @@
+---
+import Icono from './Icono.astro';
+import { MENSAJES, whatsapp } from '../lib/empresa';
+---
+<a class="flotante" aria-label="Cotizar por WhatsApp" href={whatsapp(MENSAJES.general)} target="_blank" rel="noopener" data-flotante data-evento="whatsapp" data-origen="flotante">
+  <Icono nombre="whatsapp" />
+  <span class="flotante__texto">Cotizar por WhatsApp</span>
+</a>
+
+<style>
+  .flotante {
+    position: fixed; z-index: 150;
+    right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom));
+    display: flex; align-items: center; gap: 0.75rem;
+    height: 3.5rem; padding: 0 1rem;
+    background: var(--amarillo); color: var(--negro);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
+    font-size: var(--t-sm); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    transform: translateY(calc(100% + 2rem)); opacity: 0;
+    transition: transform 0.5s var(--curva), opacity 0.4s var(--curva), background-color 0.3s;
+  }
+  .flotante :global(.icono) { width: 1.6rem; height: 1.6rem; flex: none; }
+  .flotante.visible { transform: none; opacity: 1; }
+  :global(html:not(.js)) .flotante { transform: none; opacity: 1; }
+  .flotante:hover { background: var(--blanco); }
+  .flotante.sobre-amarillo { background: var(--negro); color: var(--amarillo); }
+  .flotante__texto { display: none; }
+  @media (min-width: 768px) { .flotante__texto { display: inline; } }
+</style>

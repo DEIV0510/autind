@@ -1,0 +1,27 @@
+---
+import Legal from '../layouts/Legal.astro';
+import { EMPRESA, telHref } from '../lib/empresa';
+---
+<Legal
+  titulo="Aviso de privacidad"
+  descripcion="Aviso de privacidad de AUTIND NC S.A.S.: quién trata sus datos, para qué y cómo ejercer sus derechos."
+  vigencia="3 de noviembre de 2026"
+>
+  <p>
+    <strong>{EMPRESA.nombre}</strong>, NIT {EMPRESA.nit}, con domicilio en {EMPRESA.direccion}, {EMPRESA.region}, es responsable del tratamiento de los datos personales que usted nos entrega a través de este sitio web, de WhatsApp, por teléfono o en nuestro local.
+  </p>
+
+  <h2>Para qué usamos sus datos</h2>
+  <p>Para responder su solicitud de cotización o consulta, enviarle la información que pidió, hacer el seguimiento comercial y cumplir nuestras obligaciones legales.</p>
+
+  <h2>Sus derechos</h2>
+  <p>Puede conocer, actualizar, rectificar y pedir la supresión de sus datos, revocar la autorización y solicitar prueba de ella, en los términos de la Ley 1581 de 2012. No recogemos datos sensibles; si en algún caso se pidieran, responder sería facultativo.</p>
+
+  <h2>Cómo contactarnos</h2>
+  <p>
+    Correo <a href={`mailto:${EMPRESA.correo}`}>{EMPRESA.correo}</a> · WhatsApp y teléfono <a href={telHref}>{EMPRESA.telefonoVisible}</a> · {EMPRESA.direccion}, {EMPRESA.ciudad}.
+  </p>
+
+  <h2>Política completa</h2>
+  <p>Las condiciones, finalidades y procedimientos están en nuestra <a href="/politica-de-tratamiento-de-datos/">Política de tratamiento de datos personales</a>.</p>
+</Legal>

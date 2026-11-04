@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Servicios from '../components/Servicios.astro';
+import Proyectos from '../components/Proyectos.astro';
+import PorQue from '../components/PorQue.astro';
+import Llamado from '../components/Llamado.astro';
+import Contacto from '../components/Contacto.astro';
+import { foto, srcset } from '../lib/fotos';
+
+const portada = foto('transferencia-automatica');
+---
+<Base
+  titulo="Tableros eléctricos y material eléctrico industrial en Bogotá | AUTIND NC S.A.S."
+  descripcion="Ensamble de tableros eléctricos de distribución, transferencia y control de motores, y venta de material eléctrico industrial en Bogotá. Cotiza por WhatsApp."
+  conCargador
+>
+  <link slot="precarga" rel="preload" as="image" type="image/avif" imagesrcset={srcset(portada, 'avif')} imagesizes="(min-width: 1024px) 30vw, 62vw" fetchpriority="high" />
+  <Hero />
+  <Servicios />
+  <Proyectos />
+  <PorQue />
+  <Llamado />
+  <Contacto />
+</Base>

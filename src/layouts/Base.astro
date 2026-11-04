@@ -1,0 +1,113 @@
+---
+import '../styles/global.css';
+import fuentes from '../data/fuentes.json';
+import Cabecera from '../components/Cabecera.astro';
+import Pie from '../components/Pie.astro';
+import Cargador from '../components/Cargador.astro';
+import WhatsAppFlotante from '../components/WhatsAppFlotante.astro';
+import { EMPRESA, SERVICIOS } from '../lib/empresa';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  conCargador?: boolean;
+  noIndexar?: boolean;
+}
+const { titulo, descripcion, conCargador = false, noIndexar = false } = Astro.props;
+
+const absoluta = (ruta: string) => (Astro.site ? new URL(ruta, Astro.site).toString() : undefined);
+const canonica = absoluta(Astro.url.pathname);
+const og = absoluta('/og.jpg') ?? '/og.jpg';
+
+// Datos estructurados: solo lo que la empresa suministró o consta en su propio material.
+const negocio = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  '@id': absoluta('/#empresa'),
+  name: EMPRESA.nombre,
+  legalName: EMPRESA.nombre,
+  taxID: EMPRESA.nit,
+  description: EMPRESA.descripcion,
+  url: absoluta('/'),
+  logo: absoluta('/marca/autind-logo-600.png'),
+  image: og,
+  telephone: `+${EMPRESA.whatsapp}`,
+  email: EMPRESA.correo,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: EMPRESA.direccion,
+    addressLocality: EMPRESA.ciudad,
+    addressRegion: EMPRESA.region,
+    addressCountry: 'CO',
+  },
+  knowsAbout: ['Material eléctrico industrial', 'Tableros eléctricos', 'Tableros de distribución', 'Tableros de control de motores', 'Transferencia automática'],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Soluciones eléctricas industriales',
+    itemListElement: SERVICIOS.map((s) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: s.titulo, description: s.descripcion },
+    })),
+  },
+};
+// JSON dentro de <script>: se escapa «<» para que ningún texto pueda cerrar la etiqueta.
+const ld = (o: unknown) => JSON.stringify(o).replace(/</g, '\\u003c');
+
+// Script en línea del <head> (su huella sha256 entra en la CSP al compilar).
+// 1) Marca html.js: sin JavaScript todo se ve, sin animaciones.
+// 2) Red de seguridad: si el JS principal no llega en 6 s, se muestra todo (main.ts la cancela).
+// 3) Equipos modestos o con ahorro de datos → html.ligero (sin parallax).
+// 4) Pantalla de carga: solo portada, primera visita de la sesión y sin ahorro de datos.
+const scriptCabeza = `(function(){var h=document.documentElement;h.classList.add('js');window.__autindRed=setTimeout(function(){h.classList.add('sin-animacion','intro-lista')},6000);var n=navigator.connection,ahorro=!!(n&&(n.saveData||/2g/.test(n.effectiveType||'')));if(ahorro||((navigator.hardwareConcurrency||8)<=4&&(navigator.deviceMemory||8)<=4))h.classList.add('ligero');var c=h.hasAttribute('data-cargador')&&!ahorro;try{if(sessionStorage.getItem('autind-intro'))c=false}catch(e){}if(c){h.classList.add('con-cargador')}else{var f=function(){requestAnimationFrame(function(){requestAnimationFrame(function(){h.classList.add('intro-lista')})})};if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',f)}else{f()}}})();`;
+---
+<!doctype html>
+<html lang="es-CO" data-cargador={conCargador ? '' : undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+    {canonica && <link rel="canonical" href={canonica} />}
+    <meta name="robots" content={noIndexar ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'} />
+    <meta name="theme-color" content="#080808" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="geo.region" content="CO-DC" />
+    <meta name="geo.placename" content="Bogotá" />
+    <script is:inline set:html={scriptCabeza} />
+
+    <link rel="preload" href={fuentes.titular} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fuentes.texto} as="font" type="font/woff2" crossorigin />
+    <slot name="precarga" />
+
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CO" />
+    <meta property="og:site_name" content={EMPRESA.nombre} />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`Logo de ${EMPRESA.nombre} y tablero eléctrico de transferencia automática`} />
+    {canonica && <meta property="og:url" content={canonica} />}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {!noIndexar && <script type="application/ld+json" set:html={ld(negocio)} />}
+  </head>
+  <body>
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+    {conCargador && <Cargador />}
+    <Cabecera />
+    <main id="contenido">
+      <slot />
+    </main>
+    <Pie />
+    <WhatsAppFlotante />
+    <script>
+      import '../scripts/main';
+    </script>
+  </body>
+</html>

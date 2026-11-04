@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import Icono from '../components/Icono.astro';
+import { MENSAJES, whatsapp } from '../lib/empresa';
+---
+<Base titulo="Página no encontrada | AUTIND NC S.A.S." descripcion="La página que buscas no existe." noIndexar>
+  <section class="error">
+    <div class="reticula" aria-hidden="true"></div>
+    <div class="contenedor error__contenido">
+      <p class="rotulo"><b>404</b> Circuito abierto</p>
+      <h1 class="titular titular--2xl">Esta página no existe<span class="punto">.</span></h1>
+      <p class="parrafo">Puede que el enlace haya cambiado. Vuelve al inicio o escríbenos directamente.</p>
+      <div class="error__acciones">
+        <a class="boton" href="/"><span>Ir al inicio</span><Icono nombre="flecha" class="icono--flecha" /></a>
+        <a class="boton boton--linea" href={whatsapp(MENSAJES.general)} target="_blank" rel="noopener"><Icono nombre="whatsapp" /><span>WhatsApp</span></a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .error { position: relative; min-height: 80svh; display: grid; align-items: center; padding: calc(var(--cabecera) + 4rem) 0 4rem; }
+  .error__contenido { position: relative; display: grid; gap: 1.5rem; justify-items: start; }
+  .error__acciones { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+</style>

@@ -1,0 +1,29 @@
+---
+// Foto real en AVIF con WebP de respaldo, con ancho y alto reales (sin saltos de diseño) y el
+// color medio de la foto pintado mientras carga.
+import { foto, srcset, src } from '../lib/fotos';
+
+interface Props {
+  id: string;
+  sizes: string;
+  class?: string;
+  prioridad?: boolean;
+  alt?: string;
+}
+const { id, sizes, class: clase, prioridad = false, alt } = Astro.props;
+const f = foto(id);
+---
+<picture class:list={['foto', clase]} style={`--color-foto:${f.color};--foco:${f.foco}`}>
+  <source type="image/avif" srcset={srcset(f, 'avif')} sizes={sizes} />
+  <img
+    src={src(f, 800)}
+    srcset={srcset(f, 'webp')}
+    sizes={sizes}
+    width={f.ancho}
+    height={f.alto}
+    alt={alt ?? f.alt}
+    loading={prioridad ? 'eager' : 'lazy'}
+    decoding={prioridad ? 'sync' : 'async'}
+    fetchpriority={prioridad ? 'high' : undefined}
+  />
+</picture>

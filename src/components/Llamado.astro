@@ -1,0 +1,47 @@
+---
+// Llamado a la acción: negro, pistas de circuito amarillas que se dibujan al entrar en pantalla.
+import Icono from './Icono.astro';
+import { EMPRESA, MENSAJES, telHref, whatsapp } from '../lib/empresa';
+
+// Las pistas se quedan en los márgenes: no cruzan nunca por detrás del texto.
+const pistas = [
+  'M0 90 H110 L160 140 H236',
+  'M0 260 H80 L120 220 H200',
+  'M0 420 H150 L200 370 H250',
+  'M1200 110 H1090 L1040 160 H964',
+  'M1200 300 H1120 L1080 260 H1000',
+  'M1200 440 H1050 L1000 390 H950',
+];
+const nodos = [[236, 140], [200, 220], [250, 370], [964, 160], [1000, 260], [950, 390]];
+---
+<section class="llamado" aria-labelledby="llamado-titulo">
+  <svg class="llamado__circuito trazar" viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+    {pistas.map((d) => <path d={d} pathLength="1" />)}
+    {nodos.map(([x, y]) => <rect x={x - 4} y={y - 4} width="8" height="8" />)}
+  </svg>
+  <div class="contenedor llamado__contenido">
+    <h2 id="llamado-titulo" class="titular revelar">¿Tienes un proyecto eléctrico en mente?</h2>
+    <p class="revelar" style="--retardo:0.08s">Cuéntanos qué necesitas. Nuestro equipo está preparado para atender tu solicitud.</p>
+    <div class="llamado__acciones revelar" style="--retardo:0.16s">
+      <a class="boton boton--grande" href={whatsapp(MENSAJES.proyecto)} target="_blank" rel="noopener" data-evento="whatsapp" data-origen="llamado">
+        <Icono nombre="whatsapp" /><span>Solicitar cotización por WhatsApp</span>
+      </a>
+      <a class="enlace-flecha" href={telHref}><Icono nombre="telefono" /><span>O llámanos · {EMPRESA.telefonoVisible}</span></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .llamado { position: relative; overflow: hidden; background: var(--negro); padding-block: clamp(6rem, 12vw, 11rem); border-top: 1px solid var(--linea); }
+  .llamado__circuito { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .llamado__circuito path { fill: none; stroke: var(--amarillo); stroke-width: 1.5; opacity: 0.5; }
+  .llamado__circuito rect { fill: var(--amarillo); opacity: 0.85; }
+  @media (max-width: 767px) { .llamado__circuito { opacity: 0.45; } }
+
+  .llamado__contenido { position: relative; display: grid; justify-items: center; text-align: center; gap: 1.5rem; }
+  .llamado h2 { font-size: clamp(2rem, 0.9rem + 3.8vw, 4.4rem); max-width: 18ch; }
+  .llamado p { color: var(--gris); font-size: var(--t-md); max-width: 32rem; }
+  .llamado__acciones { display: grid; justify-items: center; gap: 1.25rem; margin-top: 1rem; }
+  .llamado__acciones .enlace-flecha :global(.icono) { color: var(--amarillo); }
+  @media (max-width: 559px) { .llamado__acciones, .llamado__acciones .boton { width: 100%; } }
+</style>

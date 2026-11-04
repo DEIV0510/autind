@@ -1,0 +1,185 @@
+---
+// Portada como una lámina de plano: retícula, el destello de 21° del logo cruzando, dos vistas
+// reales de tableros (frontal e interior) con sus cotas y, abajo, el cajetín con las cuatro
+// líneas de trabajo.
+import Foto from './Foto.astro';
+import Icono from './Icono.astro';
+import { EMPRESA, MENSAJES, SERVICIOS, whatsapp } from '../lib/empresa';
+---
+<section class="hero" id="inicio" aria-labelledby="hero-titulo">
+  <div class="reticula hero__reticula" aria-hidden="true"></div>
+  <svg class="hero__destello" viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <line x1="0" y1="400" x2="1000" y2="0" pathLength="1" />
+  </svg>
+
+  <div class="contenedor hero__grilla">
+    <div class="hero__texto">
+      <h1 id="hero-titulo">
+        <span class="hero__kicker mono intro" style="--d:0.05s">Tableros eléctricos y material eléctrico industrial · {EMPRESA.ciudad}</span>
+        <span class="hero__titular titular">
+          <span class="linea"><span class="intro-linea" style="--d:0.12s">Energía que</span></span>
+          <span class="linea"><span class="intro-linea" style="--d:0.2s">impulsa la</span></span>
+          <span class="linea"><span class="intro-linea" style="--d:0.28s">industria<span class="punto">.</span></span></span>
+        </span>
+      </h1>
+      <p class="hero__sub intro" style="--d:0.4s">
+        Material eléctrico industrial y ensamble de tableros eléctricos con soluciones diseñadas para responder a las necesidades de tu empresa.
+      </p>
+      <div class="hero__acciones intro" style="--d:0.5s">
+        <a class="boton boton--grande" href={whatsapp(MENSAJES.general)} target="_blank" rel="noopener" data-evento="whatsapp" data-origen="hero">
+          <Icono nombre="whatsapp" /><span>Solicitar cotización</span>
+        </a>
+        <a class="boton boton--linea boton--grande" href="#servicios">
+          <span>Conocer soluciones</span><Icono nombre="flecha-abajo" class="icono--flecha" />
+        </a>
+      </div>
+    </div>
+
+    <div class="hero__visual" data-parallax="0.04">
+      <figure class="lamina lamina--frontal intro-foto" style="--d:0.25s">
+        <figcaption class="lamina__pie"><span class="mono"><b>A</b> Vista frontal</span><span class="lamina__nombre">Transferencia automática</span></figcaption>
+        <div class="registro lamina__marco">
+          <Foto id="transferencia-automatica" sizes="(min-width: 1024px) 26vw, 58vw" prioridad />
+          <span class="cota cota--vertical" aria-hidden="true"><span class="mono">220 VAC</span></span>
+        </div>
+      </figure>
+      <figure class="lamina lamina--interior intro-foto" style="--d:0.45s">
+        <div class="registro lamina__marco">
+          <Foto id="control-interior" sizes="(min-width: 1024px) 24vw, 54vw" />
+        </div>
+        <figcaption class="lamina__pie"><span class="mono"><b>B</b> Vista interior</span><span class="lamina__nombre">Tablero de control</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="contenedor">
+    <ol class="cajetin intro" style="--d:0.65s" aria-label="Líneas de trabajo">
+      {SERVICIOS.map((s) => (
+        <li>
+          <a href={`#servicio-${s.id}`}>
+            <span class="mono">{s.numero}</span>
+            <span class="cajetin__texto">{s.titulo}</span>
+            <Icono nombre="flecha" class="icono--flecha" />
+          </a>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative; overflow: hidden;
+    padding-top: calc(var(--cabecera) + clamp(2rem, 6vw, 4.5rem));
+    padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+    background: var(--negro);
+  }
+  @media (min-width: 1024px) {
+    .hero { min-height: 100svh; display: flex; flex-direction: column; justify-content: space-between; }
+  }
+  .hero__reticula {
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 70% 40%, #000 30%, transparent 85%);
+    mask-image: radial-gradient(ellipse 80% 70% at 70% 40%, #000 30%, transparent 85%);
+  }
+
+  /* El destello del logo: una línea amarilla a 21° que cruza la lámina por detrás de las fotos. */
+  /* Alto = ancho · tan 21°, para que la inclinación sea la misma en cualquier pantalla. */
+  .hero__destello { position: absolute; left: -5vw; width: 110vw; height: 42vw; bottom: -4%; pointer-events: none; }
+  .hero__destello line { stroke: var(--amarillo); stroke-width: 1.5; vector-effect: non-scaling-stroke; opacity: 0.85; filter: drop-shadow(0 0 6px rgb(245 229 0 / 0.5)); }
+
+  .hero__grilla { position: relative; display: grid; gap: clamp(2.5rem, 6vw, 4rem); align-items: center; }
+  @media (min-width: 1024px) { .hero__grilla { grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr); gap: 3rem; } }
+
+  .hero__kicker {
+    display: flex; align-items: center; gap: 0.75rem; margin-bottom: clamp(1.25rem, 2.4vw, 2rem);
+    color: var(--gris); line-height: 1.5;
+  }
+  .hero__kicker::before { content: ''; width: 0.55rem; height: 0.55rem; background: var(--amarillo); flex: none; }
+
+  .hero__titular { display: block; font-size: var(--t-hero); line-height: 0.98; letter-spacing: -0.015em; }
+  .linea { display: block; overflow: hidden; padding-bottom: 0.06em; margin-bottom: -0.06em; }
+  .linea > span { display: inline-block; }
+
+  .hero__sub { margin-top: clamp(1.5rem, 2.6vw, 2.25rem); max-width: 33rem; color: var(--gris); font-size: var(--t-md); line-height: 1.65; }
+
+  .hero__acciones { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: clamp(2rem, 3.2vw, 2.75rem); }
+  @media (max-width: 559px) { .hero__acciones .boton { width: 100%; } }
+  /* El destello pasa por detrás: el botón de línea lleva fondo para que no lo atraviese. */
+  .hero__acciones .boton--linea { background-color: var(--negro); }
+
+  /* ---------------------------------------------------------------- vistas
+     A (frontal) con su rótulo encima; B (interior) monta sobre la esquina inferior derecha de A
+     y lleva el rótulo debajo: los dos rótulos nunca se pisan con las fotos. */
+  .hero__visual { position: relative; padding-bottom: 20%; will-change: transform; }
+  @media (min-width: 1024px) { .hero__visual { padding-bottom: 15%; } }
+  .lamina { position: relative; }
+  .lamina__marco { position: relative; }
+  .lamina--frontal { width: 60%; margin-left: 7%; }
+  .lamina--frontal .lamina__pie { margin: 0 0 0.85rem; }
+  .lamina--frontal .lamina__marco :global(.foto) { aspect-ratio: 3 / 4; }
+  .lamina--interior { position: absolute; right: 0; bottom: 0; width: 54%; z-index: 1; }
+  .lamina--interior .lamina__marco :global(.foto) { aspect-ratio: 4 / 3; outline: 8px solid var(--negro); }
+  @media (min-width: 1024px) {
+    .lamina--frontal { width: 58%; margin-left: 9%; }
+    .lamina--interior { width: 52%; }
+  }
+  .lamina__pie { display: grid; gap: 0.2rem; margin-top: 0.85rem; }
+  .lamina__pie .mono { color: var(--gris); }
+  .lamina__pie b { color: var(--amarillo); font-weight: 500; margin-right: 0.4rem; }
+  .lamina__nombre { font-size: var(--t-sm); font-weight: 500; }
+
+  /* Cota vertical junto a la vista frontal, como en un plano de taller. */
+  .cota { position: absolute; pointer-events: none; }
+  .cota--vertical { top: 0; bottom: 0; left: -1.6rem; width: 1px; background: var(--linea-2); }
+  .cota--vertical::before, .cota--vertical::after { content: ''; position: absolute; left: -5px; width: 11px; height: 1px; background: var(--gris); }
+  .cota--vertical::before { top: 0; }
+  .cota--vertical::after { bottom: 0; }
+  .cota--vertical .mono {
+    position: absolute; top: 50%; left: 0; transform: translate(-50%, -50%) rotate(-90deg);
+    white-space: nowrap; padding: 0.3rem 0.5rem; background: var(--negro); color: var(--gris); font-size: 0.625rem;
+  }
+  @media (max-width: 1023px) { .cota--vertical { left: -0.9rem; } }
+
+  /* ---------------------------------------------------------------- cajetín */
+  /* Fondo propio: el destello pasa por debajo del cajetín, como una capa más del plano. */
+  .cajetin {
+    position: relative; z-index: 1; background: var(--negro);
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    margin-top: clamp(2.5rem, 5vw, 3rem);
+    border-top: 1px solid var(--linea-2); border-left: 1px solid var(--linea);
+  }
+  @media (min-width: 1024px) { .cajetin { grid-template-columns: repeat(4, 1fr); } }
+  .cajetin li { border-right: 1px solid var(--linea); border-bottom: 1px solid var(--linea); }
+  .cajetin a {
+    position: relative; height: 100%;
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.75rem;
+    padding: 1rem clamp(0.75rem, 1.6vw, 1.25rem);
+    transition: background-color 0.35s var(--curva);
+  }
+  .cajetin .mono { color: var(--amarillo); }
+  .cajetin__texto { font-size: var(--t-sm); font-weight: 500; line-height: 1.35; }
+  .cajetin :global(.icono) { width: 1rem; height: 1rem; color: var(--gris); transition: transform 0.4s var(--curva), color 0.3s; }
+  .cajetin a::before { content: ''; position: absolute; left: 0; top: -1px; height: 2px; width: 100%; background: var(--amarillo); transform: scaleX(0); transform-origin: 0 50%; transition: transform 0.5s var(--curva); }
+  @media (hover: hover) {
+    .cajetin a:hover { background: var(--negro-2); }
+    .cajetin a:hover::before { transform: scaleX(1); }
+    .cajetin a:hover :global(.icono) { transform: translateX(4px); color: var(--amarillo); }
+  }
+  @media (max-width: 559px) {
+    .cajetin :global(.icono) { display: none; }
+    .cajetin a { grid-template-columns: auto 1fr; }
+  }
+
+  /* ---------------------------------------------------------------- entrada */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js:not(.sin-animacion)) :is(.intro, .intro-linea, .intro-foto, .hero__destello) {
+      transition: transform 1s var(--curva), opacity 0.9s var(--curva), clip-path 1.2s var(--curva-entra);
+      transition-delay: var(--d, 0s);
+    }
+    :global(html.js:not(.intro-lista)) .intro { opacity: 0; transform: translateY(18px); }
+    :global(html.js:not(.intro-lista)) .intro-linea { transform: translateY(105%); }
+    :global(html.js:not(.intro-lista)) .intro-foto { clip-path: inset(0 0 100% 0); }
+    :global(html.js:not(.intro-lista)) .hero__destello { clip-path: inset(0 100% 0 0); }
+    .hero__destello { --d: 0.3s; transition-duration: 1.6s; }
+  }
+</style>

@@ -1,0 +1,44 @@
+---
+import Base from './Base.astro';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  vigencia: string;
+}
+const { titulo, descripcion, vigencia } = Astro.props;
+---
+<Base titulo={`${titulo} | AUTIND NC S.A.S.`} descripcion={descripcion}>
+  <article class="legal">
+    <div class="reticula" aria-hidden="true"></div>
+    <div class="contenedor legal__contenido">
+      <p class="rotulo"><b>Legal</b> AUTIND NC S.A.S.</p>
+      <h1 class="titular titular--xl">{titulo}</h1>
+      <p class="legal__vigencia mono">Vigente desde el {vigencia}</p>
+      <div class="legal__texto">
+        <slot />
+      </div>
+      <a class="enlace-flecha legal__volver" href="/">Volver al inicio</a>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .legal { position: relative; padding: calc(var(--cabecera) + clamp(3rem, 7vw, 5rem)) 0 var(--seccion); }
+  .legal > .reticula {
+    height: 28rem;
+    -webkit-mask-image: linear-gradient(to bottom, #000, transparent);
+    mask-image: linear-gradient(to bottom, #000, transparent);
+  }
+  .legal__contenido { position: relative; max-width: 50rem; }
+  .legal h1 { margin-top: 1.25rem; }
+  .legal__vigencia { margin-top: 1rem; color: var(--gris); }
+  .legal__texto { margin-top: 2.5rem; color: var(--gris); line-height: 1.75; }
+  .legal__texto :global(h2) { margin: 2.5rem 0 0.85rem; color: var(--blanco); font-family: var(--f-titular); text-transform: uppercase; font-size: var(--t-md); line-height: 1.3; }
+  .legal__texto :global(p + p), .legal__texto :global(p + ul), .legal__texto :global(ul + p) { margin-top: 0.85rem; }
+  .legal__texto :global(ul) { display: grid; gap: 0.5rem; padding-left: 1.25rem; list-style: square; }
+  .legal__texto :global(li::marker) { color: var(--amarillo); }
+  .legal__texto :global(strong) { color: var(--blanco); font-weight: 600; }
+  .legal__texto :global(a) { color: var(--blanco); text-decoration: underline; text-underline-offset: 3px; }
+  .legal__volver { margin-top: 3rem; }
+</style>

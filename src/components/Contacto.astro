@@ -1,0 +1,182 @@
+---
+import Foto from './Foto.astro';
+import Icono from './Icono.astro';
+import { EMPRESA, MENSAJES, mapaEmbed, mapaHref, telHref, whatsapp } from '../lib/empresa';
+import { SERVICIOS } from '../lib/validacion.js';
+---
+<section id="contacto" class="seccion contacto" aria-labelledby="contacto-titulo">
+  <div class="reticula" aria-hidden="true"></div>
+  <div class="contenedor contacto__grilla">
+    <div class="contacto__info">
+      <p class="rotulo revelar"><b>06</b> Contacto</p>
+      <h2 id="contacto-titulo" class="titular titular--2xl revelar" style="--retardo:0.05s">Hablemos de tu proyecto<span class="punto">.</span></h2>
+
+      <dl class="datos revelar" style="--retardo:0.1s">
+        <div>
+          <dt class="mono">Empresa</dt>
+          <dd>{EMPRESA.nombre}<span class="datos__nota">NIT {EMPRESA.nit}</span></dd>
+        </div>
+        <div>
+          <dt class="mono">Dirección</dt>
+          <dd>{EMPRESA.direccion}<span class="datos__nota">{EMPRESA.region}, {EMPRESA.pais}</span></dd>
+        </div>
+        <div>
+          <dt class="mono">WhatsApp y teléfono</dt>
+          <dd><a href={telHref}>{EMPRESA.telefonoVisible}</a></dd>
+        </div>
+        <div>
+          <dt class="mono">Correo</dt>
+          <dd><a href={`mailto:${EMPRESA.correo}`}>{EMPRESA.correo}</a></dd>
+        </div>
+      </dl>
+
+      <div class="contacto__acciones revelar" style="--retardo:0.14s">
+        <a class="boton" href={whatsapp(MENSAJES.general)} target="_blank" rel="noopener" data-evento="whatsapp" data-origen="contacto">
+          <Icono nombre="whatsapp" /><span>WhatsApp</span>
+        </a>
+        <a class="boton boton--linea" href={telHref}><Icono nombre="telefono" /><span>Llamar</span></a>
+        <a class="boton boton--linea" href={mapaHref} target="_blank" rel="noopener"><Icono nombre="ubicacion" /><span>Cómo llegar</span></a>
+      </div>
+
+      <div class="mapa revelar" style="--retardo:0.18s" data-mapa data-src={mapaEmbed}>
+        <Foto id="local-tableros" sizes="(min-width: 1024px) 40vw, 100vw" alt="" class="mapa__foto" />
+        <div class="mapa__capa">
+          <p class="mono">Nuestro local · {EMPRESA.direccion}</p>
+          <button type="button" class="boton boton--negro" data-mapa-cargar>
+            <Icono nombre="mapa" /><span>Ver ubicación en el mapa</span>
+          </button>
+          <p class="mapa__aviso">El mapa lo sirve Google y se carga solo si lo pides.</p>
+        </div>
+      </div>
+    </div>
+
+    <form class="formulario registro revelar" style="--retardo:0.1s" data-formulario data-whatsapp={EMPRESA.whatsapp} novalidate>
+      <div class="formulario__cabeza">
+        <h3 class="titular titular--lg">Solicitud de cotización</h3>
+        <p>Menos de un minuto. Al enviarla se abre WhatsApp con tu solicitud lista.</p>
+      </div>
+
+      <div class="campo">
+        <label for="f-nombre">Nombre</label>
+        <input id="f-nombre" name="nombre" type="text" autocomplete="name" required minlength="2" maxlength="80" />
+      </div>
+      <div class="campos-2">
+        <div class="campo">
+          <label for="f-empresa">Empresa <span class="opcional">(opcional)</span></label>
+          <input id="f-empresa" name="empresa" type="text" autocomplete="organization" maxlength="100" />
+        </div>
+        <div class="campo">
+          <label for="f-telefono">Teléfono</label>
+          <input id="f-telefono" name="telefono" type="tel" inputmode="tel" autocomplete="tel" required maxlength="24" />
+        </div>
+      </div>
+      <div class="campo">
+        <label for="f-servicio">¿Qué necesitas?</label>
+        <select id="f-servicio" name="servicio" required>
+          <option value="">Elige una opción</option>
+          {SERVICIOS.map((s) => <option>{s}</option>)}
+        </select>
+      </div>
+      <div class="campo">
+        <label for="f-mensaje">Detalles del proyecto</label>
+        <textarea id="f-mensaje" name="mensaje" rows="4" required minlength="10" maxlength="800" placeholder="Tipo de tablero, cantidades, voltaje o lo que tengas a mano."></textarea>
+      </div>
+
+      <!-- Trampa para robots: una persona nunca ve ni llena este campo. -->
+      <div class="trampa" aria-hidden="true">
+        <label for="f-sitio">No llenar</label>
+        <input id="f-sitio" name="sitio_web" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div class="campo campo--check">
+        <input id="f-acepto" name="acepto" type="checkbox" required />
+        <label for="f-acepto">Autorizo el tratamiento de mis datos según la <a href="/politica-de-tratamiento-de-datos/">política de tratamiento de datos</a> y el <a href="/aviso-de-privacidad/">aviso de privacidad</a>.</label>
+      </div>
+
+      <p class="formulario__error" role="alert" data-formulario-error hidden></p>
+      <button class="boton boton--grande boton--ancho" type="submit">
+        <Icono nombre="whatsapp" /><span>Enviar solicitud por WhatsApp</span>
+      </button>
+      <div class="formulario__ok" role="status" data-formulario-ok hidden>
+        <p class="formulario__ok-titulo">Tu solicitud está lista.</p>
+        <p data-formulario-ok-texto></p>
+        <a class="enlace-flecha" href="#" target="_blank" rel="noopener" data-formulario-enlace>
+          <span>Abrir WhatsApp</span><Icono nombre="flecha" class="icono--flecha" />
+        </a>
+      </div>
+    </form>
+  </div>
+</section>
+
+<style>
+  .contacto { background: var(--negro); border-top: 1px solid var(--linea); overflow: hidden; }
+  .contacto > .reticula {
+    -webkit-mask-image: linear-gradient(to bottom, #000, transparent 70%);
+    mask-image: linear-gradient(to bottom, #000, transparent 70%);
+  }
+  .contacto__grilla { position: relative; display: grid; gap: clamp(3rem, 6vw, 5rem); }
+  @media (min-width: 1024px) { .contacto__grilla { grid-template-columns: 1fr 1fr; gap: 5vw; align-items: start; } }
+  .contacto__info .rotulo { margin-bottom: 1.25rem; }
+
+  .datos { display: grid; margin-top: 2.25rem; border-top: 1px solid var(--linea); }
+  @media (min-width: 560px) { .datos { grid-template-columns: 1fr 1fr; } }
+  .datos > div { padding: 1.1rem 1rem 1.1rem 0; border-bottom: 1px solid var(--linea); display: grid; gap: 0.35rem; align-content: start; }
+  .datos dt { color: var(--gris-2); font-size: 0.6875rem; }
+  .datos dd { font-size: var(--t-md); font-weight: 500; line-height: 1.4; display: grid; gap: 0.15rem; overflow-wrap: anywhere; }
+  .datos dd a { transition: color 0.3s; }
+  .datos dd a:hover { color: var(--amarillo); }
+  .datos__nota { font-size: var(--t-sm); font-weight: 400; color: var(--gris); }
+
+  .contacto__acciones { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.75rem; }
+  @media (max-width: 559px) { .contacto__acciones .boton { flex: 1 1 auto; } }
+
+  .mapa { position: relative; margin-top: 2rem; aspect-ratio: 16 / 10; background: var(--grafito); border: 1px solid var(--linea); overflow: hidden; }
+  .mapa :global(.mapa__foto) { position: absolute; inset: 0; }
+  .mapa__capa {
+    position: absolute; inset: 0; display: grid; align-content: end; justify-items: start; gap: 0.85rem;
+    padding: clamp(1rem, 3vw, 1.75rem);
+    background: linear-gradient(to top, rgb(8 8 8 / 0.92), rgb(8 8 8 / 0.15));
+  }
+  .mapa__capa .mono { color: var(--blanco); }
+  .mapa__capa .boton { border-color: var(--linea-2); }
+  .mapa__aviso { font-size: var(--t-xs); color: var(--gris); }
+  .mapa :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: grayscale(1) contrast(1.05); }
+  .mapa.cargado .mapa__capa, .mapa.cargado :global(.mapa__foto) { display: none; }
+
+  /* ---------------------------------------------------------------- formulario */
+  .formulario { display: grid; gap: 1.15rem; padding: clamp(1.4rem, 3.5vw, 2.75rem); background: var(--grafito); border: 1px solid var(--linea); }
+  .formulario__cabeza { display: grid; gap: 0.5rem; margin-bottom: 0.25rem; }
+  .formulario__cabeza p { color: var(--gris); font-size: var(--t-sm); }
+  .campos-2 { display: grid; gap: 1.15rem; }
+  @media (min-width: 560px) { .campos-2 { grid-template-columns: 1fr 1fr; } }
+  .campo { display: grid; gap: 0.45rem; }
+  .campo label { font-family: var(--f-mono); font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris); }
+  .opcional { text-transform: none; letter-spacing: 0; color: var(--gris-2); }
+  .campo input, .campo select, .campo textarea {
+    width: 100%; min-height: 3.1rem; padding: 0.75rem 0.9rem;
+    background: var(--negro); border: 1px solid var(--linea-2); border-radius: 0;
+    font-size: 1rem; color: var(--blanco); transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .campo textarea { resize: vertical; min-height: 7rem; line-height: 1.5; }
+  .campo ::placeholder { color: var(--gris-2); }
+  .campo select {
+    appearance: none; padding-right: 2.5rem;
+    background-image: linear-gradient(45deg, transparent 50%, var(--amarillo) 50%), linear-gradient(135deg, var(--amarillo) 50%, transparent 50%);
+    background-position: calc(100% - 1.25rem) 55%, calc(100% - 0.9rem) 55%;
+    background-size: 0.35rem 0.35rem; background-repeat: no-repeat;
+  }
+  .campo select option { background: var(--grafito); }
+  .campo input:focus, .campo select:focus, .campo textarea:focus { outline: none; border-color: var(--amarillo); box-shadow: 0 0 0 3px rgb(245 229 0 / 0.18); }
+  .campo [aria-invalid='true'] { border-color: #ff6b4a; }
+  .campo--check { grid-template-columns: auto 1fr; align-items: start; gap: 0.75rem; }
+  .campo--check input { width: 1.25rem; height: 1.25rem; min-height: 0; margin-top: 0.15rem; accent-color: var(--amarillo); }
+  .campo--check label { font-family: var(--f-texto); text-transform: none; letter-spacing: 0; font-size: var(--t-sm); line-height: 1.5; color: var(--gris); }
+  .campo--check a { color: var(--blanco); text-decoration: underline; text-underline-offset: 3px; }
+
+  .trampa { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+  .formulario__error { color: #ff8a6e; font-size: var(--t-sm); }
+  .formulario__ok { border-top: 1px solid var(--linea); padding-top: 1rem; display: grid; gap: 0.4rem; }
+  .formulario__ok-titulo { font-family: var(--f-titular); text-transform: uppercase; font-size: var(--t-md); }
+  .formulario__ok p { color: var(--gris); }
+  .formulario__ok .enlace-flecha { justify-self: start; margin-top: 0.4rem; }
+</style>

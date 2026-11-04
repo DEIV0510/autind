@@ -1,0 +1,66 @@
+---
+import Legal from '../layouts/Legal.astro';
+import { EMPRESA, telHref } from '../lib/empresa';
+---
+<Legal
+  titulo="Política de tratamiento de datos personales"
+  descripcion="Cómo AUTIND NC S.A.S. recoge, usa y protege los datos personales de quienes la contactan, conforme a la Ley 1581 de 2012."
+  vigencia="3 de noviembre de 2026"
+>
+  <h2>1. Responsable del tratamiento</h2>
+  <p>
+    <strong>{EMPRESA.nombre}</strong>, NIT {EMPRESA.nit}, con domicilio en {EMPRESA.direccion}, {EMPRESA.region}, {EMPRESA.pais}.
+    Teléfono y WhatsApp: <a href={telHref}>{EMPRESA.telefonoVisible}</a>. Correo: <a href={`mailto:${EMPRESA.correo}`}>{EMPRESA.correo}</a>.
+  </p>
+
+  <h2>2. Marco legal</h2>
+  <p>Esta política se expide en cumplimiento de la Ley Estatutaria 1581 de 2012, el Decreto 1377 de 2013 (compilado en el Decreto Único 1074 de 2015) y demás normas que los modifiquen o complementen.</p>
+
+  <h2>3. Datos que recogemos</h2>
+  <p>Solo los que la persona nos entrega de forma voluntaria al pedir una cotización o escribirnos:</p>
+  <ul>
+    <li>Nombre y, si lo indica, la empresa que representa.</li>
+    <li>Número de teléfono o de WhatsApp.</li>
+    <li>La información del proyecto que describa en su mensaje.</li>
+  </ul>
+  <p>No pedimos datos sensibles ni datos de niños, niñas o adolescentes. El sitio web no usa cookies de seguimiento ni herramientas de analítica. Para proteger el formulario contra abusos, el servidor usa la dirección IP de forma transitoria, en memoria, sin guardarla.</p>
+
+  <h2>4. Finalidades</h2>
+  <ul>
+    <li>Responder solicitudes de cotización, consultas e información sobre productos y servicios.</li>
+    <li>Preparar y enviar cotizaciones, y hacer el seguimiento comercial de la solicitud.</li>
+    <li>Coordinar la entrega de productos o la ejecución de los servicios contratados.</li>
+    <li>Cumplir obligaciones legales, contables y tributarias.</li>
+  </ul>
+
+  <h2>5. Derechos del titular</h2>
+  <p>Como titular de los datos, usted puede:</p>
+  <ul>
+    <li>Conocer, actualizar y rectificar sus datos personales.</li>
+    <li>Solicitar prueba de la autorización otorgada.</li>
+    <li>Ser informado sobre el uso que se ha dado a sus datos.</li>
+    <li>Presentar quejas ante la Superintendencia de Industria y Comercio por infracciones a la ley.</li>
+    <li>Revocar la autorización o pedir la supresión de sus datos cuando no exista un deber legal o contractual de conservarlos.</li>
+    <li>Acceder de forma gratuita a sus datos personales.</li>
+  </ul>
+
+  <h2>6. Consultas y reclamos</h2>
+  <p>Puede ejercer sus derechos escribiendo a <a href={`mailto:${EMPRESA.correo}`}>{EMPRESA.correo}</a>, por WhatsApp al {EMPRESA.telefonoVisible} o en nuestra dirección. La solicitud debe incluir su nombre, un medio de contacto y la descripción de lo que pide.</p>
+  <ul>
+    <li><strong>Consultas:</strong> se responden en un máximo de diez (10) días hábiles desde su recibo. Si no es posible en ese plazo, le informaremos el motivo y la nueva fecha, que no superará cinco (5) días hábiles adicionales.</li>
+    <li><strong>Reclamos</strong> (corrección, actualización, supresión o revocatoria): se atienden en un máximo de quince (15) días hábiles desde el día siguiente a su recibo, prorrogables por ocho (8) días hábiles informando el motivo. Si el reclamo está incompleto, le pediremos completarlo dentro de los cinco (5) días siguientes.</li>
+  </ul>
+
+  <h2>7. Encargados y transferencias</h2>
+  <p>
+    Cuando usted decide escribirnos por WhatsApp, el mensaje viaja por los servicios de WhatsApp (Meta Platforms), bajo sus propias condiciones.
+    Si el formulario está configurado para enviar una copia por correo, ese envío lo hace un proveedor de correo electrónico que actúa como encargado y puede tener servidores fuera de Colombia.
+    El mapa de la sección de contacto lo presta Google y solo se carga si usted lo solicita. No vendemos ni cedemos sus datos a terceros.
+  </p>
+
+  <h2>8. Seguridad</h2>
+  <p>Aplicamos medidas técnicas y administrativas razonables para proteger la información: conexión cifrada (HTTPS), validación de los datos en el navegador y en el servidor, límites contra el envío masivo de solicitudes y acceso restringido a la información recibida.</p>
+
+  <h2>9. Vigencia</h2>
+  <p>Esta política rige desde el 3 de noviembre de 2026. Los datos se conservarán mientras sean necesarios para las finalidades descritas o mientras exista una obligación legal. Cualquier cambio sustancial se publicará en esta misma página.</p>
+</Legal>

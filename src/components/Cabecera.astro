@@ -1,0 +1,146 @@
+---
+import Icono from './Icono.astro';
+import Logo from './Logo.astro';
+import { EMPRESA, MENSAJES, NAV, telHref, whatsapp } from '../lib/empresa';
+---
+<header class="cabecera" data-cabecera>
+  <div class="contenedor cabecera__barra">
+    <a class="cabecera__logo" href="/" aria-label={`${EMPRESA.nombre} — inicio`}>
+      <Logo ancho={96} sizes="96px" prioridad />
+    </a>
+
+    <nav class="cabecera__nav" aria-label="Principal">
+      {NAV.map((n) => <a href={n.href} data-seccion={n.seccion}>{n.texto}</a>)}
+    </nav>
+
+    <div class="cabecera__acciones">
+      <a class="cabecera__tel" href={telHref}>
+        <Icono nombre="telefono" />
+        <span>{EMPRESA.telefonoVisible}</span>
+      </a>
+      <a class="boton cabecera__cta" aria-label="Cotizar por WhatsApp" href={whatsapp(MENSAJES.general)} target="_blank" rel="noopener" data-evento="whatsapp" data-origen="cabecera">
+        <Icono nombre="whatsapp" />
+        <span>Cotizar</span>
+      </a>
+      <button class="cabecera__abrir" type="button" aria-expanded="false" aria-controls="menu" data-menu-abrir>
+        <Icono nombre="menu" />
+        <span class="sr">Abrir menú</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="menu" class="menu" data-menu hidden>
+  <div class="reticula" aria-hidden="true"></div>
+  <div class="contenedor menu__barra">
+    <a class="cabecera__logo" href="/" aria-label={`${EMPRESA.nombre} — inicio`} data-menu-enlace>
+      <Logo ancho={96} sizes="96px" />
+    </a>
+    <button class="menu__cerrar" type="button" data-menu-cerrar>
+      <Icono nombre="cerrar" />
+      <span class="sr">Cerrar menú</span>
+    </button>
+  </div>
+  <nav class="contenedor menu__nav" aria-label="Menú">
+    {NAV.map((n, i) => (
+      <a href={n.href} data-menu-enlace>
+        <span class="mono">0{i + 1}</span>
+        <span class="menu__texto">{n.texto}</span>
+      </a>
+    ))}
+  </nav>
+  <div class="contenedor menu__acciones">
+    <a class="boton boton--ancho" href={whatsapp(MENSAJES.general)} target="_blank" rel="noopener" data-evento="whatsapp" data-origen="menu">
+      <Icono nombre="whatsapp" /><span>Cotizar por WhatsApp</span>
+    </a>
+    <a class="boton boton--linea boton--ancho" href={telHref}>
+      <Icono nombre="telefono" /><span>Llamar · {EMPRESA.telefonoVisible}</span>
+    </a>
+    <p class="menu__dir mono">{EMPRESA.direccion} · {EMPRESA.ciudad}</p>
+  </div>
+</div>
+
+<style>
+  .cabecera {
+    position: fixed; inset: 0 0 auto; z-index: 200;
+    height: var(--cabecera);
+    transition: background-color 0.4s var(--curva), transform 0.45s var(--curva), border-color 0.4s;
+    border-bottom: 1px solid transparent;
+  }
+  .cabecera.solida {
+    background: rgb(8 8 8 / 0.92);
+    border-bottom-color: var(--linea);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+  .cabecera.oculta { transform: translateY(-100%); }
+
+  .cabecera__barra, .menu__barra {
+    height: var(--cabecera);
+    display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+  }
+  .cabecera__logo { display: block; flex: none; }
+  .cabecera__logo :global(img) { width: 76px; height: auto; }
+  @media (min-width: 1024px) { .cabecera__logo :global(img) { width: 96px; } }
+
+  .cabecera__nav { display: none; }
+  @media (min-width: 1024px) {
+    .cabecera__nav { display: flex; gap: clamp(1.25rem, 2.4vw, 2.5rem); }
+    .cabecera__nav a {
+      position: relative; padding-block: 0.5rem;
+      font-size: var(--t-sm); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--gris); transition: color 0.3s;
+    }
+    .cabecera__nav a::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+      background: var(--amarillo); transform: scaleX(0); transform-origin: 0 50%;
+      transition: transform 0.45s var(--curva);
+    }
+    .cabecera__nav a:hover, .cabecera__nav a[aria-current] { color: var(--blanco); }
+    .cabecera__nav a:hover::after, .cabecera__nav a[aria-current]::after { transform: scaleX(1); }
+  }
+
+  .cabecera__acciones { display: flex; align-items: center; gap: 0.75rem; }
+  .cabecera__tel { display: none; }
+  @media (min-width: 1200px) {
+    .cabecera__tel {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: var(--f-mono); font-size: var(--t-sm); color: var(--blanco); padding: 0.5rem;
+    }
+    .cabecera__tel :global(.icono) { width: 1.05rem; height: 1.05rem; color: var(--amarillo); }
+    .cabecera__tel:hover { color: var(--amarillo); }
+  }
+  .cabecera__cta { min-height: 2.75rem; padding: 0.6rem 1.1rem; }
+  @media (max-width: 380px) { .cabecera__cta span { display: none; } }
+
+  .cabecera__abrir, .menu__cerrar {
+    display: grid; place-items: center; width: 2.75rem; height: 2.75rem;
+    border: 1px solid var(--linea-2); color: var(--blanco);
+  }
+  .cabecera__abrir :global(.icono), .menu__cerrar :global(.icono) { width: 1.4rem; height: 1.4rem; }
+  @media (min-width: 1024px) { .cabecera__abrir { display: none; } }
+
+  .menu {
+    position: fixed; inset: 0; z-index: 300;
+    background: var(--negro); overflow-y: auto; overscroll-behavior: contain;
+    display: flex; flex-direction: column;
+    opacity: 0; transition: opacity 0.35s var(--curva);
+  }
+  .menu.abierto { opacity: 1; }
+  .menu__nav { display: grid; margin-top: 2rem; border-top: 1px solid var(--linea); }
+  .menu__nav a {
+    display: flex; align-items: baseline; gap: 1rem;
+    padding: 1.15rem 0; border-bottom: 1px solid var(--linea);
+    transform: translateY(12px); opacity: 0;
+    transition: transform 0.5s var(--curva), opacity 0.5s var(--curva);
+  }
+  .menu.abierto .menu__nav a { transform: none; opacity: 1; }
+  .menu.abierto .menu__nav a:nth-child(2) { transition-delay: 0.04s; }
+  .menu.abierto .menu__nav a:nth-child(3) { transition-delay: 0.08s; }
+  .menu.abierto .menu__nav a:nth-child(4) { transition-delay: 0.12s; }
+  .menu__nav .mono { color: var(--amarillo); }
+  .menu__texto { font-family: var(--f-titular); font-size: clamp(1.5rem, 6vw, 2.25rem); text-transform: uppercase; line-height: 1.1; }
+  .menu__acciones { display: grid; gap: 0.75rem; margin-top: auto; padding-block: 2rem calc(1.5rem + env(safe-area-inset-bottom)); }
+  .menu__dir { color: var(--gris); margin-top: 0.5rem; }
+  @media (min-width: 1024px) { .menu { display: none !important; } }
+</style>

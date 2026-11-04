@@ -1,0 +1,245 @@
+@import './fuentes.css';
+
+/* ==========================================================================
+   AUTIND — «Engineering the power of industry»
+   Negro profundo, amarillo industrial, blanco y filos plateados como el arco del logo.
+   Esquinas rectas. Un solo ángulo de sistema: 21°, la inclinación del destello del logo.
+   ========================================================================== */
+
+:root {
+  --negro: #080808;
+  --negro-2: #0e0e0e;
+  --grafito: #191919;
+  --grafito-2: #222;
+  --amarillo: #f5e500;
+  --amarillo-2: #fff35c;
+  --blanco: #fff;
+  --gris: #a5a5a5;
+  --gris-2: #8a8a8a;
+  --linea: rgb(255 255 255 / 0.1);
+  --linea-2: rgb(255 255 255 / 0.2);
+  --reticula: rgb(255 255 255 / 0.045);
+  --plata: linear-gradient(90deg, #4c5157 0%, #d9dde1 38%, #f4f6f8 50%, #a7adb4 66%, #4c5157 100%);
+  --ovalo: rgb(5 11 16);
+
+  --angulo: 21deg;
+  --curva: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --curva-entra: cubic-bezier(0.6, 0, 0.2, 1);
+
+  --ancho: 1360px;
+  --margen: clamp(1rem, 4vw, 3.5rem);
+  --seccion: clamp(5rem, 9vw, 9rem);
+  --cabecera: 72px;
+
+  --t-xs: 0.75rem;
+  --t-sm: 0.875rem;
+  --t-base: 1rem;
+  --t-md: 1.125rem;
+  --t-lg: clamp(1.25rem, 1.05rem + 0.6vw, 1.5rem);
+  --t-xl: clamp(1.6rem, 1.1rem + 1.6vw, 2.4rem);
+  --t-2xl: clamp(2rem, 1.1rem + 3vw, 3.6rem);
+  --t-hero: clamp(2.25rem, 0.9rem + 4.6vw, 5.4rem);
+
+  color-scheme: dark;
+}
+
+@media (min-width: 1024px) {
+  :root { --cabecera: 84px; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--cabecera) + 12px);
+  background: var(--negro);
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  min-height: 100vh;
+  background: var(--negro);
+  color: var(--blanco);
+  font-family: var(--f-texto);
+  font-size: var(--t-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+img, picture, svg, video { display: block; max-width: 100%; }
+/* «hidden» gana siempre, aunque el componente declare display:grid o flex. */
+[hidden] { display: none !important; }
+img { height: auto; }
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { background: none; border: 0; cursor: pointer; }
+ul, ol { list-style: none; }
+h1, h2, h3, h4 { font-weight: 700; line-height: 1.05; text-wrap: balance; }
+p { text-wrap: pretty; }
+::selection { background: var(--amarillo); color: var(--negro); }
+
+:focus-visible { outline: 2px solid var(--amarillo); outline-offset: 3px; }
+
+.saltar {
+  position: fixed; left: 1rem; top: -4rem; z-index: 500;
+  padding: 0.75rem 1rem; background: var(--amarillo); color: var(--negro); font-weight: 600;
+}
+.saltar:focus { top: 1rem; }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.contenedor { width: min(100% - 2 * var(--margen), var(--ancho)); margin-inline: auto; }
+.seccion { padding-block: var(--seccion); position: relative; }
+
+/* ---------------------------------------------------------------- tipografía */
+
+.titular {
+  font-family: var(--f-titular);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+}
+.titular--2xl { font-size: var(--t-2xl); }
+.titular--xl { font-size: var(--t-xl); }
+.titular--lg { font-size: var(--t-lg); line-height: 1.15; }
+.punto { color: var(--amarillo); }
+
+/* Rótulo técnico: el número de lámina de un plano. No es una cápsula: texto monoespaciado
+   con un filo amarillo corto. Solo en las secciones que lo necesitan. */
+.rotulo {
+  display: inline-flex; align-items: center; gap: 0.85rem;
+  font-family: var(--f-mono); font-size: var(--t-xs); font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--gris);
+}
+.rotulo::before { content: ''; width: 2rem; height: 2px; background: var(--amarillo); flex: none; }
+.rotulo b { color: var(--blanco); font-weight: 500; }
+
+.mono {
+  font-family: var(--f-mono); font-weight: 500; font-size: var(--t-xs);
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+
+.parrafo { color: var(--gris); font-size: var(--t-md); line-height: 1.65; max-width: 34rem; }
+
+/* ---------------------------------------------------------------- botones */
+
+.boton {
+  --fondo: var(--amarillo);
+  --tinta: var(--negro);
+  position: relative; isolation: isolate; overflow: hidden;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.7rem;
+  min-height: 3.25rem; padding: 0.9rem 1.5rem;
+  background: var(--fondo); color: var(--tinta);
+  font-family: var(--f-texto); font-size: var(--t-sm); font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.2;
+  border: 1px solid var(--fondo);
+  transition: color 0.35s var(--curva), border-color 0.35s var(--curva), background-color 0.35s var(--curva);
+}
+.boton .icono { width: 1.25rem; height: 1.25rem; flex: none; transition: transform 0.45s var(--curva); }
+/* Barrido a 21° al pasar el puntero: la misma inclinación del destello del logo. */
+.boton::after {
+  content: ''; position: absolute; inset: -2px -30%; z-index: -1;
+  background: var(--blanco);
+  transform: translateX(-105%) skewX(calc(-1 * var(--angulo)));
+  transition: transform 0.55s var(--curva);
+}
+@media (hover: hover) {
+  .boton:hover::after { transform: translateX(0) skewX(calc(-1 * var(--angulo))); }
+  .boton:hover .icono--flecha { transform: translateX(4px); }
+}
+.boton:active { transform: translateY(1px); }
+
+.boton--linea { --fondo: transparent; --tinta: var(--blanco); border-color: var(--linea-2); }
+.boton--linea::after { background: var(--amarillo); }
+@media (hover: hover) {
+  .boton--linea:hover { color: var(--negro); border-color: var(--amarillo); }
+}
+.boton--negro { --fondo: var(--negro); --tinta: var(--blanco); }
+.boton--negro::after { background: var(--grafito-2); }
+@media (hover: hover) {
+  .boton--negro:hover { color: var(--amarillo); }
+}
+.boton--grande { min-height: 4rem; padding: 1.1rem 2rem; font-size: var(--t-base); }
+.boton--ancho { width: 100%; }
+
+.enlace-flecha {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  font-size: var(--t-sm); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--blanco); padding-block: 0.4rem;
+  background: linear-gradient(var(--amarillo), var(--amarillo)) no-repeat 0 100% / 0 2px;
+  transition: background-size 0.45s var(--curva), color 0.3s;
+}
+.enlace-flecha .icono { width: 1.1rem; height: 1.1rem; transition: transform 0.45s var(--curva); }
+@media (hover: hover) {
+  .enlace-flecha:hover { background-size: 100% 2px; }
+  .enlace-flecha:hover .icono { transform: translateX(4px); }
+}
+
+/* ---------------------------------------------------------------- fotos */
+
+.foto { display: block; background: var(--color-foto, var(--grafito)); overflow: hidden; }
+.foto img { width: 100%; height: 100%; object-fit: cover; object-position: var(--foco, 50% 50%); }
+
+/* Marcas de registro en las esquinas, como en una lámina técnica. */
+.registro { position: relative; }
+.registro::before, .registro::after {
+  content: ''; position: absolute; width: 14px; height: 14px; pointer-events: none; z-index: 2;
+  border: 0 solid var(--amarillo);
+}
+.registro::before { top: -7px; left: -7px; border-top-width: 2px; border-left-width: 2px; }
+.registro::after { bottom: -7px; right: -7px; border-bottom-width: 2px; border-right-width: 2px; }
+
+/* Retícula de plano (fondo). */
+.reticula {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(var(--reticula) 1px, transparent 1px),
+    linear-gradient(90deg, var(--reticula) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-position: -1px -1px;
+}
+
+/* Filo plateado: el metal del arco del logo, solo en líneas finas. */
+.filo-plata { height: 1px; background: var(--plata); opacity: 0.7; }
+
+/* ---------------------------------------------------------------- unifilares */
+.unifilar { width: 100%; height: auto; overflow: visible; color: var(--gris-2); }
+.unifilar :is(path, line, circle, rect, polyline) {
+  fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: square;
+}
+.unifilar .relleno { fill: currentColor; stroke: none; }
+.unifilar .acento { color: var(--amarillo); stroke: var(--amarillo); }
+.unifilar text { fill: currentColor; stroke: none; font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.06em; }
+
+/* ---------------------------------------------------------------- entradas al scroll
+   Sin JavaScript (o si el JS falla) todo se ve sin animación. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js:not(.sin-animacion) .revelar {
+    opacity: 0; transform: translate3d(0, 28px, 0);
+    transition: opacity 0.9s var(--curva), transform 0.9s var(--curva);
+    transition-delay: var(--retardo, 0s);
+  }
+  html.js:not(.sin-animacion) .revelar.visible { opacity: 1; transform: none; }
+
+  html.js:not(.sin-animacion) .revelar-foto { clip-path: inset(0 0 100% 0); transition: clip-path 1.2s var(--curva-entra); transition-delay: var(--retardo, 0s); }
+  html.js:not(.sin-animacion) .revelar-foto img { transform: scale(1.12); transition: transform 1.6s var(--curva); transition-delay: var(--retardo, 0s); }
+  html.js:not(.sin-animacion) .revelar-foto.visible { clip-path: inset(0 0 0 0); }
+  html.js:not(.sin-animacion) .revelar-foto.visible img { transform: none; }
+
+  html.js:not(.sin-animacion) .trazar :is(path, line, circle, rect, polyline) {
+    /* Cada trazo lleva pathLength="1": la misma animación sirve para cualquier largo. */
+    stroke-dasharray: 1; stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.4s var(--curva-entra); transition-delay: var(--retardo, 0.2s);
+  }
+  html.js:not(.sin-animacion) .trazar.visible :is(path, line, circle, rect, polyline) { stroke-dashoffset: 0; }
+}
+
+/* Equipos modestos o con ahorro de datos: sin parallax ni animaciones largas. */
+html.ligero [data-parallax] { transform: none !important; }

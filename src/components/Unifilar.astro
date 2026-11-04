@@ -1,0 +1,78 @@
+---
+// Diagramas unifilares con símbolos eléctricos (IEC) dibujados a mano en SVG: el mismo lenguaje
+// de los diagramas que AUTIND pinta en las puertas de sus tableros. Cada trazo lleva
+// pathLength="1" para que se dibuje al aparecer (.trazar en global.css).
+interface Props {
+  tipo: 'material' | 'ensamble' | 'distribucion' | 'motores';
+  class?: string;
+}
+const { tipo, class: clase } = Astro.props;
+---
+<svg class:list={['unifilar', 'trazar', clase]} viewBox="0 0 260 64" aria-hidden="true" focusable="false">
+  {tipo === 'material' && (
+    <>
+      {/* Acometida → interruptor automático → fusible → bornera */}
+      <path d="M2 32 H56" pathLength="1" />
+      <path class="acento" d="M56 32 L84 18" pathLength="1" />
+      <path class="acento" d="M86 28 L94 36 M86 36 L94 28" pathLength="1" />
+      <path d="M90 32 H128" pathLength="1" />
+      <rect x="128" y="25" width="38" height="14" pathLength="1" />
+      <path d="M128 32 H166" pathLength="1" />
+      <path d="M166 32 H204" pathLength="1" />
+      <circle cx="211" cy="32" r="7" pathLength="1" />
+      <path d="M218 32 H258" pathLength="1" />
+      <text x="128" y="56">F1</text>
+      <text x="62" y="56">Q1</text>
+      <text x="203" y="56">X1</text>
+    </>
+  )}
+  {tipo === 'ensamble' && (
+    <>
+      {/* Vista de montaje: gabinete, rieles DIN, módulos y canaleta */}
+      <rect x="20" y="4" width="220" height="56" pathLength="1" />
+      <path d="M32 20 H228" pathLength="1" />
+      <path d="M32 44 H228" pathLength="1" />
+      <rect class="acento" x="44" y="13" width="10" height="14" pathLength="1" />
+      <rect class="acento" x="58" y="13" width="10" height="14" pathLength="1" />
+      <rect class="acento" x="72" y="13" width="10" height="14" pathLength="1" />
+      <rect x="96" y="11" width="24" height="18" pathLength="1" />
+      <rect x="44" y="36" width="18" height="16" pathLength="1" />
+      <rect x="68" y="36" width="18" height="16" pathLength="1" />
+      <rect x="92" y="36" width="18" height="16" pathLength="1" />
+      <path d="M150 12 V52 M158 12 V52" pathLength="1" />
+      <path d="M176 38 h4 m4 0 h4 m4 0 h4 m4 0 h4 m4 0 h4 m4 0 h4" pathLength="1" />
+    </>
+  )}
+  {tipo === 'distribucion' && (
+    <>
+      {/* Barraje principal con cuatro circuitos derivados protegidos */}
+      <path class="acento" d="M8 10 H252" pathLength="1" style="stroke-width:3" />
+      {[44, 104, 164, 224].map((x) => (
+        <>
+          <path d={`M${x} 10 V22`} pathLength="1" />
+          <path d={`M${x - 4} 18 L${x + 4} 26 M${x - 4} 26 L${x + 4} 18`} pathLength="1" />
+          <path class="acento" d={`M${x} 42 L${x - 11} 25`} pathLength="1" />
+          <path d={`M${x} 42 V56`} pathLength="1" />
+          <path d={`M${x - 4} 52 L${x} 58 L${x + 4} 52`} pathLength="1" />
+        </>
+      ))}
+    </>
+  )}
+  {tipo === 'motores' && (
+    <>
+      {/* Contactor → relé térmico → motor trifásico */}
+      <path d="M2 32 H52" pathLength="1" />
+      <path class="acento" d="M52 32 L78 19" pathLength="1" />
+      <path class="acento" d="M82 26 a6 6 0 0 1 0 12" pathLength="1" />
+      <path d="M82 32 H112" pathLength="1" />
+      <rect x="112" y="22" width="40" height="20" pathLength="1" />
+      <path d="M116 32 h7 v-6 h7 v12 h7 v-6 h11" pathLength="1" />
+      <path d="M152 32 H190" pathLength="1" />
+      <circle class="acento" cx="212" cy="32" r="21" pathLength="1" />
+      <text x="206" y="30">M</text>
+      <text x="203" y="44">3~</text>
+      <text x="56" y="58">KM1</text>
+      <text x="118" y="58">F2</text>
+    </>
+  )}
+</svg>

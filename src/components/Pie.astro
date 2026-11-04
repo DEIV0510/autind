@@ -1,0 +1,65 @@
+---
+import Logo from './Logo.astro';
+import { EMPRESA, SERVICIOS, telHref, whatsapp, MENSAJES } from '../lib/empresa';
+const ano = new Date().getFullYear();
+---
+<footer class="pie">
+  <div class="filo-plata" aria-hidden="true"></div>
+  <div class="contenedor pie__grilla">
+    <div class="pie__marca">
+      <Logo ancho={220} sizes="220px" />
+      <p class="pie__nombre">{EMPRESA.nombre}</p>
+      <p class="pie__desc">Compra y venta de material eléctrico industrial. Ensamble y fabricación de tableros eléctricos de distribución y control.</p>
+    </div>
+
+    <nav class="pie__col" aria-label="Servicios">
+      <p class="mono">Servicios</p>
+      <ul>
+        {SERVICIOS.map((s) => <li><a href={`/#servicio-${s.id}`}>{s.titulo}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="pie__col">
+      <p class="mono">Contacto</p>
+      <ul>
+        <li>{EMPRESA.direccion}<br />{EMPRESA.region}, {EMPRESA.pais}</li>
+        <li>Teléfono: <a href={telHref}>{EMPRESA.telefonoVisible}</a></li>
+        <li>WhatsApp: <a href={whatsapp(MENSAJES.general)} target="_blank" rel="noopener" data-evento="whatsapp" data-origen="pie">{EMPRESA.telefonoVisible}</a></li>
+        <li><a href={`mailto:${EMPRESA.correo}`}>{EMPRESA.correo}</a></li>
+      </ul>
+    </div>
+
+    <nav class="pie__col" aria-label="Legal">
+      <p class="mono">Legal</p>
+      <ul>
+        <li><a href="/aviso-de-privacidad/">Aviso de privacidad</a></li>
+        <li><a href="/politica-de-tratamiento-de-datos/">Política de tratamiento de datos personales</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="contenedor pie__base">
+    <p>© {ano} {EMPRESA.nombre} · NIT {EMPRESA.nit} · {EMPRESA.ciudad}, {EMPRESA.pais}</p>
+    <a href="#contenido" class="mono pie__arriba">Volver arriba ↑</a>
+  </div>
+</footer>
+
+<style>
+  .pie { background: var(--negro); padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
+  .pie__grilla { display: grid; gap: 2.5rem; padding-block: clamp(3.5rem, 7vw, 5.5rem) 3rem; }
+  @media (min-width: 768px) { .pie__grilla { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 1100px) { .pie__grilla { grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 3rem; } }
+  .pie__marca :global(img) { width: 200px; height: auto; }
+  .pie__nombre { margin-top: 1.25rem; font-family: var(--f-titular); text-transform: uppercase; font-size: var(--t-md); }
+  .pie__desc { margin-top: 0.6rem; color: var(--gris); font-size: var(--t-sm); max-width: 22rem; }
+  .pie__col .mono { color: var(--amarillo); margin-bottom: 1rem; }
+  .pie__col ul { display: grid; gap: 0.7rem; font-size: var(--t-sm); color: var(--gris); }
+  .pie__col a { color: var(--blanco); transition: color 0.3s; overflow-wrap: anywhere; }
+  .pie__col a:hover { color: var(--amarillo); }
+  .pie__base {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem;
+    padding-top: 1.5rem; border-top: 1px solid var(--linea);
+    font-size: var(--t-xs); color: var(--gris-2);
+  }
+  .pie__arriba { color: var(--gris); }
+  .pie__arriba:hover { color: var(--amarillo); }
+</style>
