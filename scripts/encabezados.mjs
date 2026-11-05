@@ -29,7 +29,7 @@ export const REGLAS = [
   // Con hash en el nombre: no cambian nunca.
   ...['_astro', 'fonts'].map((d) => ({ ruta: `/${d}/*`, encabezados: { 'Cache-Control': UN_ANO } })),
   // Fotos y marca: se regeneran con el mismo nombre si cambia el original → caché de un mes.
-  ...['img', 'marca'].map((d) => ({ ruta: `/${d}/*`, encabezados: { 'Cache-Control': UN_MES } })),
+  ...['img', 'img-productos', 'marca'].map((d) => ({ ruta: `/${d}/*`, encabezados: { 'Cache-Control': UN_MES } })),
   ...['/og.jpg', '/favicon.png', '/apple-touch-icon.png', '/icono-192.png', '/icono-512.png', '/site.webmanifest', '/robots.txt', '/sitemap.xml'].map((r) => ({
     ruta: r,
     encabezados: { 'Cache-Control': UN_DIA },

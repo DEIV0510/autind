@@ -84,6 +84,14 @@ export const SERVICIOS: {
   },
 ];
 
+// Líneas de producto (de la propuesta del cliente para «Productos destacados»).
+export const LINEAS = [
+  { numero: '01', titulo: 'Material eléctrico industrial', mensaje: 'Hola, AUTIND. Quiero cotizar material eléctrico industrial.' },
+  { numero: '02', titulo: 'Variadores de velocidad', mensaje: 'Hola, AUTIND. Quiero cotizar variadores de velocidad.' },
+  { numero: '03', titulo: 'Cables encauchetados y control', mensaje: 'Hola, AUTIND. Quiero cotizar cable encauchetado y cable de control.' },
+  { numero: '04', titulo: 'Control de motores', mensaje: 'Hola, AUTIND. Quiero cotizar material para control de motores.' },
+];
+
 export const NAV = [
   { href: '/#servicios', seccion: 'servicios', texto: 'Servicios' },
   { href: '/#proyectos', seccion: 'proyectos', texto: 'Proyectos' },

@@ -182,6 +182,38 @@ p { text-wrap: pretty; }
   .enlace-flecha:hover .icono { transform: translateX(4px); }
 }
 
+/* ---------------------------------------------------------------- filtros (galería y catálogo) */
+  .filtros {
+    display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none;
+    margin-bottom: clamp(1.5rem, 3vw, 2.25rem); padding-bottom: 2px;
+    margin-inline: calc(-1 * var(--margen)); padding-inline: var(--margen);
+    scroll-padding-inline: var(--margen);
+  }
+  .filtros::-webkit-scrollbar { display: none; }
+  .filtros button {
+    flex: none; display: inline-flex; align-items: center; gap: 0.6rem;
+    min-height: 2.75rem; padding: 0.55rem 1rem;
+    border: 1px solid var(--linea-2); color: var(--gris);
+    font-size: var(--t-sm); font-weight: 500;
+    transition: color 0.3s, border-color 0.3s, background-color 0.3s;
+  }
+  .filtros button .mono { color: var(--gris-2); transition: color 0.3s; }
+  .filtros button:hover { color: var(--blanco); border-color: var(--gris-2); }
+  .filtros button[aria-pressed='true'] { background: var(--amarillo); border-color: var(--amarillo); color: var(--negro); }
+  .filtros button[aria-pressed='true'] .mono { color: var(--negro); }
+
+
+/* ---------------------------------------------------------------- catálogo */
+/* Ruta de navegación (Inicio › Productos › …) */
+.migas { display: flex; flex-wrap: wrap; gap: 0.5rem; color: var(--gris-2); font-size: 0.6875rem; }
+.migas a { color: var(--gris); transition: color 0.3s; }
+.migas a:hover { color: var(--amarillo); }
+.migas [aria-current] { color: var(--blanco); }
+
+.rejilla-productos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(0.6rem, 1.6vw, 1.25rem); }
+@media (min-width: 700px) { .rejilla-productos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .rejilla-productos { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
 /* ---------------------------------------------------------------- fotos */
 
 .foto { display: block; background: var(--color-foto, var(--grafito)); overflow: hidden; }

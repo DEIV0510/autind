@@ -19,6 +19,9 @@
 /img/*
   Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
 
+/img-productos/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
 /marca/*
   Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
 

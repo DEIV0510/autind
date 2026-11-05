@@ -1,0 +1,28 @@
+---
+// Foto propia de un producto (AVIF con WebP de respaldo), con su tamaño real y su color medio
+// mientras carga.
+import { juego, srcFoto, type FotoProducto } from '../lib/productos';
+
+interface Props {
+  foto: FotoProducto;
+  alt: string;
+  sizes: string;
+  class?: string;
+  prioridad?: boolean;
+}
+const { foto, alt, sizes, class: clase, prioridad = false } = Astro.props;
+---
+<picture class:list={['foto', clase]} style={`--color-foto:${foto.color}`}>
+  <source type="image/avif" srcset={juego(foto, 'avif')} sizes={sizes} />
+  <img
+    src={srcFoto(foto)}
+    srcset={juego(foto, 'webp')}
+    sizes={sizes}
+    width={foto.ancho}
+    height={foto.alto}
+    alt={alt}
+    loading={prioridad ? 'eager' : 'lazy'}
+    decoding={prioridad ? 'sync' : 'async'}
+    fetchpriority={prioridad ? 'high' : undefined}
+  />
+</picture>

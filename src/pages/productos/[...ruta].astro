@@ -1,0 +1,103 @@
+---
+// /productos/ (catálogo) y /productos/<slug>/ (ficha). Sin productos en src/data/productos.json no
+// se genera ninguna de las dos páginas.
+import Base from '../../layouts/Base.astro';
+import FichaProducto from '../../components/FichaProducto.astro';
+import Icono from '../../components/Icono.astro';
+import TarjetaProducto from '../../components/TarjetaProducto.astro';
+import { EMPRESA, MENSAJES, whatsapp } from '../../lib/empresa';
+import { CATEGORIAS_PRODUCTO, PRODUCTOS, fotosDe, hayProductos, idCategoria, srcFoto, type Producto } from '../../lib/productos';
+
+export function getStaticPaths() {
+  if (!hayProductos) return [];
+  return [
+    { params: { ruta: undefined }, props: { producto: undefined } },
+    ...PRODUCTOS.map((p) => ({ params: { ruta: p.slug }, props: { producto: p } })),
+  ];
+}
+
+const { producto } = Astro.props as { producto?: Producto };
+const absoluta = (ruta: string) => (Astro.site ? new URL(ruta, Astro.site).toString() : undefined);
+const ld = (o: unknown) => JSON.stringify(o).replace(/</g, '\\u003c');
+
+const datos = producto
+  ? [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: producto.nombre,
+        sku: producto.referencia,
+        mpn: producto.referencia,
+        brand: { '@type': 'Brand', name: producto.marca },
+        category: producto.categoria,
+        description: producto.descripcion[0] ?? producto.resumen,
+        image: fotosDe(producto).map((f) => absoluta(srcFoto(f, 1200)) ?? srcFoto(f, 1200)),
+        url: absoluta(Astro.url.pathname),
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Inicio', item: absoluta('/') },
+          { '@type': 'ListItem', position: 2, name: 'Productos', item: absoluta('/productos/') },
+          { '@type': 'ListItem', position: 3, name: producto.nombre, item: absoluta(Astro.url.pathname) },
+        ],
+      },
+    ]
+  : [];
+---
+{producto ? (
+  <Base
+    titulo={`${producto.nombre} (${producto.referencia}) | ${EMPRESA.nombre}`}
+    descripcion={`${producto.nombre}, ref. ${producto.referencia}. ${producto.resumen}. Cotiza precio y disponibilidad por WhatsApp con ${EMPRESA.nombreCorto} en ${EMPRESA.ciudad}.`}
+  >
+    {datos.map((o) => <script type="application/ld+json" slot="precarga" set:html={ld(o)} />)}
+    <FichaProducto producto={producto} />
+  </Base>
+) : (
+  <Base
+    titulo={`Productos: material eléctrico industrial en ${EMPRESA.ciudad} | ${EMPRESA.nombre}`}
+    descripcion={`Material eléctrico industrial: protección, control de motores y más. Cotiza precio y disponibilidad por WhatsApp con ${EMPRESA.nombreCorto} en ${EMPRESA.ciudad}.`}
+  >
+    <section class="catalogo">
+      <div class="reticula catalogo__reticula" aria-hidden="true"></div>
+      <div class="contenedor">
+        <nav class="migas mono" aria-label="Ruta de navegación"><a href="/">Inicio</a><span aria-hidden="true">›</span><span aria-current="page">Productos</span></nav>
+        <header class="catalogo__cabeza">
+          <h1 class="titular titular--2xl">Productos<span class="punto">.</span></h1>
+          <p class="parrafo">Material eléctrico industrial. Precio y disponibilidad por WhatsApp.</p>
+        </header>
+        {CATEGORIAS_PRODUCTO.length > 1 && (
+          <div class="filtros" role="toolbar" aria-label="Filtrar por categoría" data-catalogo-filtros>
+            <button type="button" aria-pressed="true" data-filtro="todos">Todos <span class="mono">{PRODUCTOS.length}</span></button>
+            {CATEGORIAS_PRODUCTO.map((c) => (
+              <button type="button" aria-pressed="false" data-filtro={idCategoria(c)}>
+                {c} <span class="mono">{PRODUCTOS.filter((p) => p.categoria === c).length}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        <p class="sr" aria-live="polite" data-catalogo-estado></p>
+        <div class="rejilla-productos" data-catalogo>
+          {PRODUCTOS.map((p) => <TarjetaProducto producto={p} />)}
+        </div>
+        <div class="catalogo__ayuda">
+          <p>¿No encuentras la referencia que necesitas?</p>
+          <a class="boton boton--linea" href={whatsapp(MENSAJES.material)} target="_blank" rel="noopener" data-evento="whatsapp" data-origen="catalogo">
+            <Icono nombre="whatsapp" /><span>Pregúntanos por WhatsApp</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </Base>
+)}
+
+<style>
+  .catalogo { position: relative; padding: calc(var(--cabecera) + clamp(1.5rem, 4vw, 2.5rem)) 0 var(--seccion); }
+  .catalogo__reticula { height: 26rem; -webkit-mask-image: linear-gradient(#000, transparent); mask-image: linear-gradient(#000, transparent); }
+  .catalogo > .contenedor { position: relative; }
+  .catalogo__cabeza { display: grid; gap: 1rem; margin: clamp(1.25rem, 3vw, 2rem) 0 clamp(1.75rem, 3.5vw, 2.5rem); }
+  .catalogo__ayuda { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-top: clamp(2.5rem, 5vw, 3.5rem); padding-top: 1.5rem; border-top: 1px solid var(--linea); }
+  .catalogo__ayuda p { font-family: var(--f-titular); text-transform: uppercase; font-size: var(--t-md); }
+  [data-catalogo] > [hidden] { display: none; }
+</style>

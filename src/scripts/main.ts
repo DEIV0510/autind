@@ -384,5 +384,129 @@ if (form) {
   });
 }
 
+// ----------------------------------------------------------------- catálogo: filtros
+const filtrosCatalogo = $('[data-catalogo-filtros]');
+const catalogo = $('[data-catalogo]');
+if (filtrosCatalogo && catalogo) {
+  const tarjetas = $$('.tp', catalogo);
+  const estado = $('[data-catalogo-estado]');
+  const aplicar = (f: string) => {
+    let n = 0;
+    $$('[data-filtro]', filtrosCatalogo).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filtro === f)));
+    tarjetas.forEach((t) => { const ok = f === 'todos' || t.dataset.categoria === f; t.hidden = !ok; if (ok) n++; });
+    if (estado) estado.textContent = `${n} ${n === 1 ? 'producto' : 'productos'}`;
+  };
+  filtrosCatalogo.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-filtro]');
+    if (!b) return;
+    aplicar(b.dataset.filtro!);
+    const url = new URL(location.href);
+    if (b.dataset.filtro === 'todos') url.searchParams.delete('categoria'); else url.searchParams.set('categoria', b.dataset.filtro!);
+    history.replaceState(history.state, '', url);
+  });
+  // La ruta de navegación de una ficha enlaza a /productos/?categoria=…
+  const pedida = new URLSearchParams(location.search).get('categoria');
+  if (pedida && $(`[data-filtro="${CSS.escape(pedida)}"]`, filtrosCatalogo)) aplicar(pedida);
+}
+
+// ----------------------------------------------------------------- ficha de producto
+const galeria = $('[data-galeria]');
+if (galeria) {
+  const fotos = $$('[data-foto]', galeria);
+  const minis = $$<HTMLButtonElement>('[data-mini]', galeria);
+  const contador = $('[data-galeria-contador]', galeria);
+  let actual = 0;
+  const ir = (i: number) => {
+    actual = (i + fotos.length) % fotos.length;
+    fotos.forEach((f, j) => { f.hidden = j !== actual; });
+    minis.forEach((m, j) => m.setAttribute('aria-pressed', String(j === actual)));
+    if (contador) contador.textContent = `${actual + 1} / ${fotos.length}`;
+  };
+  $('[data-galeria-anterior]', galeria)?.addEventListener('click', () => ir(actual - 1));
+  $('[data-galeria-siguiente]', galeria)?.addEventListener('click', () => ir(actual + 1));
+  minis.forEach((m) => m.addEventListener('click', () => ir(Number(m.dataset.mini))));
+  // Deslizar con el dedo sobre la foto (sin capturar el puntero: el toque sigue siendo un clic).
+  const principal = $('.galeria__principal', galeria)!;
+  let x0: number | null = null;
+  principal.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') x0 = e.clientX; });
+  principal.addEventListener('pointerup', (e) => {
+    if (x0 === null || fotos.length < 2) { x0 = null; return; }
+    const dx = e.clientX - x0;
+    x0 = null;
+    if (Math.abs(dx) > 50) ir(actual + (dx < 0 ? 1 : -1));
+  });
+  principal.addEventListener('pointercancel', () => { x0 = null; });
+
+  // Foto ampliada, con su propia entrada en el historial («atrás» la cierra).
+  const zoom = $<HTMLDialogElement>('[data-zoom]');
+  const datosZoom = JSON.parse($('#datos-zoom')?.textContent || '[]') as { avif: string; webp: string; src: string; ancho: number; alto: number }[];
+  if (zoom && datosZoom.length) {
+    const img = $<HTMLImageElement>('[data-zoom-img]', zoom)!;
+    const avif = $<HTMLSourceElement>('[data-zoom-avif]', zoom)!;
+    let enHistorial = false;
+    const pedirCierre = () => { if (enHistorial) history.back(); else zoom.close(); };
+    $('[data-galeria-zoom]', galeria)?.addEventListener('click', () => {
+      const d = datosZoom[actual];
+      avif.srcset = d.avif;
+      img.srcset = d.webp;
+      img.src = d.src;
+      img.width = d.ancho;
+      img.height = d.alto;
+      zoom.showModal();
+      bloquearScroll();
+      history.pushState({ autindCapa: 'zoom' }, '');
+      enHistorial = true;
+    });
+    zoom.addEventListener('close', () => {
+      liberarScroll();
+      if (enHistorial) { enHistorial = false; history.back(); }
+    });
+    zoom.addEventListener('cancel', (e) => { e.preventDefault(); pedirCierre(); });
+    zoom.addEventListener('click', (e) => { if (e.target === zoom || e.target === img) pedirCierre(); });
+    $('[data-zoom-cerrar]', zoom)?.addEventListener('click', pedirCierre);
+    window.addEventListener('popstate', () => { if (enHistorial) { enHistorial = false; zoom.close(); } });
+  }
+}
+
+// Cantidad → el mensaje de WhatsApp lleva la cantidad elegida.
+const cantidad = $<HTMLInputElement>('[data-cantidad]');
+const cotizar = $<HTMLAnchorElement>('[data-cotizar]');
+if (cantidad && cotizar) {
+  const leer = () => Math.min(999, Math.max(1, Math.round(Number(cantidad.value) || 1)));
+  const actualizar = () => {
+    const texto = cotizar.dataset.plantilla!.replace('{n}', String(leer()));
+    cotizar.href = `https://wa.me/${cotizar.dataset.whatsapp}?text=${encodeURIComponent(texto)}`;
+  };
+  $('[data-cantidad-menos]')?.addEventListener('click', () => { cantidad.value = String(Math.max(1, leer() - 1)); actualizar(); });
+  $('[data-cantidad-mas]')?.addEventListener('click', () => { cantidad.value = String(Math.min(999, leer() + 1)); actualizar(); });
+  cantidad.addEventListener('input', actualizar);
+  cantidad.addEventListener('change', () => { cantidad.value = String(leer()); actualizar(); });
+  actualizar();
+}
+
+// Compartir: la hoja del sistema en el celular; en escritorio, copiar el enlace.
+$$<HTMLButtonElement>('[data-compartir]').forEach((b) => b.addEventListener('click', async () => {
+  const texto = $('[data-compartir-texto]', b);
+  try {
+    if (navigator.share) { await navigator.share({ title: b.dataset.titulo, url: location.href }); return; }
+    await navigator.clipboard.writeText(location.href);
+    if (texto) { texto.textContent = 'Enlace copiado'; setTimeout(() => { texto.textContent = 'Compartir'; }, 2200); }
+  } catch {
+    // La persona canceló o el navegador no dio permiso: no pasa nada.
+  }
+}));
+
+// «Volver»: si se llegó desde este mismo sitio, regresa al punto exacto; si no, va al catálogo.
+$$<HTMLAnchorElement>('[data-volver]').forEach((a) => a.addEventListener('click', (e) => {
+  try {
+    if (document.referrer && new URL(document.referrer).origin === location.origin && history.length > 1) {
+      e.preventDefault();
+      history.back();
+    }
+  } catch {
+    // referrer ilegible: navegación normal al catálogo
+  }
+}));
+
 // Estado inicial (por si la página se abre ya desplazada, p. ej. al volver atrás).
 alDesplazar();

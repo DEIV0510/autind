@@ -1,7 +1,13 @@
 ---
 import Icono from './Icono.astro';
 import Logo from './Logo.astro';
-import { EMPRESA, MENSAJES, NAV, telHref, whatsapp } from '../lib/empresa';
+import { EMPRESA, MENSAJES, NAV as NAV_BASE, telHref, whatsapp } from '../lib/empresa';
+import { hayProductos } from '../lib/productos';
+
+// «Productos» aparece en el menú solo cuando el catálogo tiene productos.
+const NAV = hayProductos
+  ? [NAV_BASE[0], { href: '/productos/', seccion: undefined, texto: 'Productos' }, ...NAV_BASE.slice(1)]
+  : NAV_BASE;
 ---
 <header class="cabecera" data-cabecera>
   <div class="contenedor cabecera__barra">

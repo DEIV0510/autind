@@ -1,0 +1,216 @@
+---
+// Página de un producto: ruta de navegación, galería con miniaturas y ampliación, referencia,
+// «Precio a consultar», cantidad y WhatsApp con el producto y la cantidad ya escritos, ficha
+// técnica, descripción y relacionados.
+import FotoProducto from './FotoProducto.astro';
+import Icono from './Icono.astro';
+import TarjetaProducto from './TarjetaProducto.astro';
+import { EMPRESA, whatsapp } from '../lib/empresa';
+import { MENSAJES_PRODUCTO, fotosDe, idCategoria, juego, relacionados, srcFoto, type Producto } from '../lib/productos';
+
+interface Props {
+  producto: Producto;
+}
+const { producto: p } = Astro.props;
+const fotos = fotosDe(p);
+const absoluta = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
+const otros = relacionados(p);
+const plantilla = MENSAJES_PRODUCTO.cotizar(p, '{n}' as unknown as number, absoluta);
+// Datos del visor ampliado (JSON, no se ejecuta).
+const datosZoom = JSON.stringify(fotos.map((f) => ({ avif: juego(f, 'avif'), webp: juego(f, 'webp'), src: srcFoto(f, 1600), ancho: f.ancho, alto: f.alto }))).replace(/</g, '\\u003c');
+---
+<article class="ficha" data-ficha>
+  <div class="reticula ficha__reticula" aria-hidden="true"></div>
+  <div class="contenedor">
+    <div class="ficha__barra">
+      <nav class="migas mono" aria-label="Ruta de navegación">
+        <a href="/">Inicio</a><span aria-hidden="true">›</span>
+        <a href="/productos/">Productos</a><span aria-hidden="true">›</span>
+        <a href={`/productos/?categoria=${idCategoria(p.categoria)}`}>{p.categoria}</a><span aria-hidden="true">›</span>
+        <span aria-current="page">{p.nombre}</span>
+      </nav>
+      <a class="enlace-flecha ficha__volver" href="/productos/" data-volver><Icono nombre="anterior" /><span>Volver</span></a>
+    </div>
+
+    <div class="ficha__grilla">
+      <header class="ficha__cabeza">
+        <p class="mono ficha__ref">Ref. {p.referencia} <span aria-hidden="true">·</span> {p.categoria}</p>
+        <h1 class="ficha__titulo">{p.nombre}</h1>
+        <p class="ficha__marca">{p.marca}</p>
+        <p class="ficha__precio">Precio a consultar</p>
+        <p class="ficha__nota">Precio y disponibilidad sujetos a confirmación.</p>
+      </header>
+
+      <div class="ficha__galeria" data-galeria>
+        <div class="galeria__principal">
+          {fotos.map((f, i) => (
+            <div class="galeria__foto" data-foto={i} hidden={i > 0}>
+              <FotoProducto foto={f} alt={i === 0 ? p.nombre : `${p.nombre}, foto ${i + 1}`} sizes="(min-width: 1024px) 46vw, 100vw" prioridad={i === 0} />
+            </div>
+          ))}
+          <button type="button" class="galeria__control galeria__zoom" data-galeria-zoom>
+            <Icono nombre="zoom" /><span class="sr">Ampliar foto</span>
+          </button>
+          {fotos.length > 1 && (
+            <>
+              <button type="button" class="galeria__control galeria__nav galeria__nav--anterior" data-galeria-anterior>
+                <Icono nombre="anterior" /><span class="sr">Foto anterior</span>
+              </button>
+              <button type="button" class="galeria__control galeria__nav galeria__nav--siguiente" data-galeria-siguiente>
+                <Icono nombre="siguiente" /><span class="sr">Foto siguiente</span>
+              </button>
+              <span class="galeria__contador mono" data-galeria-contador aria-live="polite">1 / {fotos.length}</span>
+            </>
+          )}
+        </div>
+        {fotos.length > 1 && (
+          <div class="galeria__miniaturas" role="group" aria-label="Fotos del producto">
+            {fotos.map((f, i) => (
+              <button type="button" class="galeria__mini" aria-pressed={i === 0 ? 'true' : 'false'} data-mini={i}>
+                <FotoProducto foto={f} alt="" sizes="88px" />
+                <span class="sr">Ver foto {i + 1}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div class="ficha__compra">
+        <div class="cantidad">
+          <label class="mono" for="cantidad">Cantidad</label>
+          <div class="cantidad__control">
+            <button type="button" data-cantidad-menos><Icono nombre="menos" /><span class="sr">Menos</span></button>
+            <input id="cantidad" type="number" inputmode="numeric" min="1" max="999" value="1" data-cantidad />
+            <button type="button" data-cantidad-mas><Icono nombre="mas" /><span class="sr">Más</span></button>
+          </div>
+        </div>
+        <a class="boton boton--grande boton--ancho" href={whatsapp(MENSAJES_PRODUCTO.cotizar(p, 1, absoluta))} target="_blank" rel="noopener"
+          data-cotizar data-plantilla={plantilla} data-whatsapp={EMPRESA.whatsapp} data-evento="whatsapp" data-origen={`ficha-${p.slug}`}>
+          <Icono nombre="whatsapp" /><span>Cotizar por WhatsApp</span>
+        </a>
+        <a class="boton boton--linea boton--ancho" href={whatsapp(MENSAJES_PRODUCTO.disponibilidad(p, absoluta))} target="_blank" rel="noopener" data-evento="whatsapp" data-origen={`disponibilidad-${p.slug}`}>
+          <span>Consultar disponibilidad</span>
+        </a>
+        <ul class="garantias">
+          <li><Icono nombre="check" /><div><b>Precio confirmado por WhatsApp</b><span>Te respondemos con precio y disponibilidad.</span></div></li>
+          <li><Icono nombre="chat" /><div><b>Asesoría comercial</b><span>Te ayudamos a elegir la referencia correcta.</span></div></li>
+          <li><Icono nombre="ubicacion" /><div><b>Local en {EMPRESA.ciudad}</b><span>{EMPRESA.direccion}</span></div></li>
+        </ul>
+        <button type="button" class="enlace-flecha ficha__compartir" data-compartir data-titulo={p.nombre}>
+          <Icono nombre="compartir" /><span data-compartir-texto>Compartir</span>
+        </button>
+      </div>
+    </div>
+
+    {p.ficha.length > 0 && (
+      <section class="ficha__bloque" aria-labelledby="detalles-titulo">
+        <h2 id="detalles-titulo" class="mono">Detalles principales</h2>
+        <dl class="detalles">
+          {p.ficha.map(([clave, valor]) => <div><dt>{clave}</dt><dd>{valor}</dd></div>)}
+        </dl>
+      </section>
+    )}
+    {p.descripcion.length > 0 && (
+      <section class="ficha__bloque" aria-labelledby="descripcion-titulo">
+        <h2 id="descripcion-titulo" class="mono">Descripción</h2>
+        <div class="ficha__descripcion">{p.descripcion.map((d) => <p>{d}</p>)}</div>
+      </section>
+    )}
+    {otros.length > 0 && (
+      <section class="ficha__bloque" aria-labelledby="relacionados-titulo">
+        <h2 id="relacionados-titulo" class="mono">También te puede interesar</h2>
+        <div class="rejilla-productos">{otros.map((o) => <TarjetaProducto producto={o} />)}</div>
+      </section>
+    )}
+  </div>
+
+  <dialog class="zoom" data-zoom aria-label={`Foto ampliada: ${p.nombre}`}>
+    <button type="button" class="galeria__control zoom__cerrar" data-zoom-cerrar><Icono nombre="cerrar" /><span class="sr">Cerrar</span></button>
+    <picture><source type="image/avif" data-zoom-avif /><img data-zoom-img alt={p.nombre} sizes="100vw" /></picture>
+  </dialog>
+  <script type="application/json" id="datos-zoom" set:html={datosZoom} />
+</article>
+
+<style>
+  .ficha { position: relative; padding: calc(var(--cabecera) + clamp(1.5rem, 4vw, 2.5rem)) 0 var(--seccion); }
+  .ficha__reticula { height: 26rem; -webkit-mask-image: linear-gradient(#000, transparent); mask-image: linear-gradient(#000, transparent); }
+  .ficha > .contenedor { position: relative; }
+
+  .ficha__barra { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem 1.5rem; margin-bottom: clamp(1.25rem, 3vw, 2rem); }
+  .ficha__volver :global(.icono) { color: var(--amarillo); }
+
+  /* Celular: título y precio arriba, luego la galería y la compra (como la referencia). */
+  .ficha__grilla { display: grid; gap: 1.5rem; grid-template-areas: 'cabeza' 'galeria' 'compra'; }
+  @media (min-width: 1024px) {
+    .ficha__grilla { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); grid-template-areas: 'galeria cabeza' 'galeria compra'; grid-template-rows: auto 1fr; gap: 0 clamp(2rem, 4vw, 4rem); }
+  }
+  .ficha__cabeza { grid-area: cabeza; display: grid; gap: 0.5rem; align-content: start; }
+  .ficha__galeria { grid-area: galeria; }
+  @media (min-width: 1024px) { .ficha__galeria { position: sticky; top: calc(var(--cabecera) + 1rem); align-self: start; } }
+  .ficha__compra { grid-area: compra; display: grid; gap: 0.75rem; align-content: start; }
+  @media (min-width: 1024px) { .ficha__compra { margin-top: 1.75rem; } }
+
+  .ficha__ref { color: var(--gris); }
+  .ficha__titulo { font-family: var(--f-titular); text-transform: uppercase; font-size: clamp(1.6rem, 1rem + 2vw, 2.6rem); line-height: 1.08; }
+  .ficha__marca { color: var(--amarillo); font-weight: 600; letter-spacing: 0.04em; }
+  .ficha__precio { margin-top: 0.75rem; font-family: var(--f-titular); font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.2rem); text-transform: uppercase; }
+  .ficha__nota { color: var(--gris); font-size: var(--t-sm); }
+
+  .galeria__principal { position: relative; background: #efefef; border: 1px solid var(--linea); overflow: hidden; }
+  .galeria__principal::before { content: ''; position: absolute; z-index: 1; top: 0; left: 0; width: 1.6rem; height: 1.6rem; background: var(--amarillo); clip-path: polygon(0 0, 100% 0, 0 100%); }
+  .galeria__foto :global(.foto) { aspect-ratio: 1 / 1; background: #efefef; }
+  .galeria__foto :global(img) { object-fit: contain; }
+  .galeria__control {
+    position: absolute; z-index: 2; display: grid; place-items: center; width: 2.75rem; height: 2.75rem;
+    background: var(--negro); color: var(--blanco); border: 1px solid var(--linea-2); transition: color 0.3s, border-color 0.3s;
+  }
+  .galeria__control:hover { color: var(--amarillo); border-color: var(--amarillo); }
+  .galeria__control :global(.icono) { width: 1.25rem; height: 1.25rem; }
+  .galeria__zoom { top: 0.75rem; right: 0.75rem; }
+  .galeria__nav { top: 50%; transform: translateY(-50%); }
+  .galeria__nav--anterior { left: 0.75rem; }
+  .galeria__nav--siguiente { right: 0.75rem; }
+  .galeria__contador { position: absolute; z-index: 2; right: 0.75rem; bottom: 0.75rem; padding: 0.4rem 0.7rem; background: var(--negro); color: var(--blanco); }
+  /* En celular el botón flotante de WhatsApp ocupa la esquina derecha. */
+  @media (max-width: 767px) { .galeria__contador { right: auto; left: 0.75rem; } }
+  .galeria__miniaturas { display: flex; gap: 0.5rem; margin-top: 0.75rem; overflow-x: auto; scrollbar-width: none; }
+  .galeria__mini { flex: none; width: 5.5rem; border: 2px solid transparent; background: #efefef; transition: border-color 0.3s; }
+  .galeria__mini :global(.foto) { aspect-ratio: 1 / 1; }
+  .galeria__mini[aria-pressed='true'] { border-color: var(--amarillo); }
+
+  .cantidad { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 0.25rem; }
+  .cantidad label { color: var(--gris); }
+  .cantidad__control { display: grid; grid-template-columns: 3rem 4.5rem 3rem; border: 1px solid var(--linea-2); }
+  .cantidad__control button { display: grid; place-items: center; height: 3rem; color: var(--blanco); transition: color 0.3s, background-color 0.3s; }
+  .cantidad__control button:hover { color: var(--negro); background: var(--amarillo); }
+  .cantidad__control :global(.icono) { width: 1.1rem; height: 1.1rem; }
+  .cantidad__control input {
+    width: 100%; height: 3rem; text-align: center; background: var(--negro); border: 0;
+    border-inline: 1px solid var(--linea-2); border-radius: 0; font-family: var(--f-mono); font-size: 1rem; -moz-appearance: textfield;
+  }
+  .cantidad__control input::-webkit-outer-spin-button, .cantidad__control input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .garantias { display: grid; margin-top: 0.75rem; border-top: 1px solid var(--linea); }
+  .garantias li { display: flex; gap: 0.85rem; padding: 0.9rem 0; border-bottom: 1px solid var(--linea); }
+  .garantias :global(.icono) { width: 1.25rem; height: 1.25rem; color: var(--amarillo); flex: none; margin-top: 0.15rem; }
+  .garantias div { display: grid; gap: 0.1rem; }
+  .garantias b { font-weight: 600; font-size: var(--t-sm); }
+  .garantias span { color: var(--gris); font-size: var(--t-sm); }
+  .ficha__compartir { justify-self: start; }
+  .ficha__compartir :global(.icono) { color: var(--amarillo); }
+
+  .ficha__bloque { margin-top: clamp(3rem, 6vw, 4.5rem); }
+  .ficha__bloque h2 { color: var(--amarillo); margin-bottom: 1.25rem; font-size: var(--t-xs); }
+  .detalles { display: grid; border-top: 1px solid var(--linea); max-width: 52rem; }
+  @media (min-width: 768px) { .detalles { grid-template-columns: 1fr 1fr; column-gap: 2.5rem; } }
+  .detalles div { display: grid; grid-template-columns: 11rem 1fr; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--linea); }
+  .detalles dt { color: var(--gris); font-size: var(--t-sm); }
+  .detalles dd { font-weight: 500; font-size: var(--t-sm); }
+  .ficha__descripcion { display: grid; gap: 0.85rem; max-width: 46rem; color: var(--gris); line-height: 1.75; }
+
+  .zoom { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: rgb(8 8 8 / 0.97); }
+  .zoom[open] { display: grid; place-items: center; }
+  .zoom picture, .zoom img { max-width: 100%; max-height: 100%; }
+  .zoom img { width: auto; height: auto; max-height: 92svh; max-width: 94vw; object-fit: contain; background: #efefef; }
+  .zoom__cerrar { top: 1rem; right: 1rem; position: fixed; }
+</style>

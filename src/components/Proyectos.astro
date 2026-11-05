@@ -102,25 +102,6 @@ const visorJson = JSON.stringify({ fotos: datosVisor, whatsapp: EMPRESA.whatsapp
   .proyectos__cabeza .rotulo { margin-bottom: 1.25rem; }
   .proyectos__cabeza h2 { max-width: 18ch; }
 
-  .filtros {
-    display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none;
-    margin-bottom: clamp(1.5rem, 3vw, 2.25rem); padding-bottom: 2px;
-    margin-inline: calc(-1 * var(--margen)); padding-inline: var(--margen);
-    scroll-padding-inline: var(--margen);
-  }
-  .filtros::-webkit-scrollbar { display: none; }
-  .filtros button {
-    flex: none; display: inline-flex; align-items: center; gap: 0.6rem;
-    min-height: 2.75rem; padding: 0.55rem 1rem;
-    border: 1px solid var(--linea-2); color: var(--gris);
-    font-size: var(--t-sm); font-weight: 500;
-    transition: color 0.3s, border-color 0.3s, background-color 0.3s;
-  }
-  .filtros button .mono { color: var(--gris-2); transition: color 0.3s; }
-  .filtros button:hover { color: var(--blanco); border-color: var(--gris-2); }
-  .filtros button[aria-pressed='true'] { background: var(--amarillo); border-color: var(--amarillo); color: var(--negro); }
-  .filtros button[aria-pressed='true'] .mono { color: var(--negro); }
-
   .mosaico {
     --columnas: 2;
     --hueco: 0.5rem;

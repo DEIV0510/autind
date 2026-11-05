@@ -7,10 +7,11 @@
     "dev": "astro dev --port 5620",
     "build": "astro build && node scripts/csp.mjs",
     "preview": "node scripts/serve-dist.mjs 5621",
-    "assets": "npm run fuentes && npm run marca && npm run imagenes",
+    "assets": "npm run fuentes && npm run marca && npm run imagenes && npm run productos",
     "fuentes": "node scripts/fuentes.mjs",
     "marca": "node scripts/marca.mjs",
     "imagenes": "node scripts/imagenes.mjs",
+    "productos": "node scripts/productos.mjs",
     "headers": "node scripts/encabezados.mjs",
     "check": "astro check && npm run build",
     "qa": "node .cache/qa/interaccion.mjs"
@@ -28,6 +29,7 @@
     "@fontsource-variable/encode-sans": "^5.3.0",
     "@fontsource-variable/ibm-plex-sans": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@types/node": "^26.6.6",
     "sharp": "^0.35.5",
     "subset-font": "^2.9.0",
     "typescript": "^6.0.3"

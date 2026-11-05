@@ -1,0 +1,61 @@
+---
+// Tarjeta del catálogo: foto grande, marca, nombre, «Precio a consultar» y el botón de WhatsApp a
+// todo el ancho (la misma lectura de una tienda de herramientas, con la identidad de AUTIND).
+import FotoProducto from './FotoProducto.astro';
+import Icono from './Icono.astro';
+import { MENSAJES_PRODUCTO, fotosDe, idCategoria, urlProducto, type Producto } from '../lib/productos';
+import { whatsapp } from '../lib/empresa';
+
+interface Props {
+  producto: Producto;
+  sizes?: string;
+}
+const { producto: p, sizes = '(min-width: 1100px) 300px, (min-width: 640px) 30vw, 50vw' } = Astro.props;
+const [portada] = fotosDe(p);
+const url = urlProducto(p);
+const absoluta = Astro.site ? new URL(url, Astro.site).toString() : undefined;
+---
+<article class="tp" data-categoria={idCategoria(p.categoria)}>
+  <a class="tp__foto" href={url} tabindex="-1" aria-hidden="true">
+    <FotoProducto foto={portada} alt="" sizes={sizes} />
+  </a>
+  <div class="tp__cuerpo">
+    <p class="tp__marca mono">{p.marca}</p>
+    <h3 class="tp__nombre"><a href={url}>{p.nombre}</a></h3>
+    <p class="tp__resumen">{p.resumen}</p>
+    <p class="tp__precio">Precio a consultar</p>
+    <a class="boton boton--ancho tp__boton" href={whatsapp(MENSAJES_PRODUCTO.cotizar(p, 1, absoluta))} target="_blank" rel="noopener" data-evento="whatsapp" data-origen={`producto-${p.slug}`}>
+      <Icono nombre="whatsapp" /><span>Cotizar</span>
+    </a>
+  </div>
+</article>
+
+<style>
+  .tp { position: relative; display: grid; grid-template-rows: auto 1fr; background: var(--grafito); border: 1px solid var(--linea); transition: border-color 0.35s var(--curva); }
+  /* Esquinas en triángulo amarillo, como en la propuesta del cliente. */
+  .tp::before, .tp::after { content: ''; position: absolute; z-index: 1; width: 1.4rem; height: 1.4rem; background: var(--amarillo); pointer-events: none; }
+  .tp::before { top: -1px; left: -1px; clip-path: polygon(0 0, 100% 0, 0 100%); }
+  .tp::after { right: -1px; bottom: -1px; clip-path: polygon(100% 0, 100% 100%, 0 100%); opacity: 0; transition: opacity 0.35s; }
+  .tp__foto { display: block; overflow: hidden; background: #efefef; }
+  .tp__foto :global(.foto) { aspect-ratio: 1 / 1; }
+  .tp__foto :global(img) { transition: transform 0.9s var(--curva); }
+  .tp__cuerpo { display: flex; flex-direction: column; gap: 0.35rem; padding: clamp(0.85rem, 1.6vw, 1.15rem); }
+  .tp__marca { color: var(--amarillo); font-size: 0.625rem; }
+  .tp__nombre { font-family: var(--f-texto); font-size: var(--t-base); font-weight: 600; line-height: 1.3; text-wrap: pretty; }
+  .tp__nombre a { background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1px; transition: background-size 0.4s var(--curva); }
+  .tp__resumen { color: var(--gris); font-size: var(--t-sm); line-height: 1.45; }
+  .tp__precio { margin-top: auto; padding-top: 0.6rem; font-family: var(--f-titular); font-size: var(--t-md); text-transform: uppercase; }
+  .tp__boton { margin-top: 0.6rem; min-height: 2.9rem; }
+  @media (hover: hover) {
+    .tp:hover { border-color: var(--linea-2); }
+    .tp:hover::after { opacity: 1; }
+    .tp:hover .tp__foto :global(img) { transform: scale(1.04); }
+    .tp:hover .tp__nombre a { background-size: 100% 1px; }
+  }
+  @media (max-width: 559px) {
+    .tp__resumen { display: none; }
+    .tp__nombre { font-size: var(--t-sm); }
+    .tp__precio { font-size: var(--t-sm); }
+    .tp__boton { font-size: 0.75rem; padding-inline: 0.75rem; }
+  }
+</style>
